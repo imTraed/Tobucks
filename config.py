@@ -30,11 +30,12 @@ class ProductionConfig(Config):
     DEBUG = False
     
     # Para Heroku/PostgreSQL
-    database_url = os.environ.get("DATABASE_URI")
+    # Render y Heroku suelen usar DATABASE_URL; también soportamos DATABASE_URI
+    database_url = os.environ.get("DATABASE_URL") or os.environ.get("DATABASE_URI")
     if database_url and database_url.startswith("postgres://"):
         # Heroku usa postgres://, SQLAlchemy 1.4+ necesita postgresql://
         database_url = database_url.replace("postgres://", "postgresql://", 1)
-    
+
     SQLALCHEMY_DATABASE_URI = database_url or "sqlite:///instance/bus_station.db"
 
 
