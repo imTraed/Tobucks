@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+
+{% block title %}Películas - Tobucks{% endblock %}
+
+{% block head %}
+<style>
+  /* --- ESTILOS BASE --- */
+  body { background-color: #0f0f0f; }
+  .movies-wrapper { max-width: 1700px; margin: 0 auto; padding: 0 15px 100px; }
+
+  /* HEADER */
+  .movies-header {
+    text-align: center; padding: 80px 20px 50px; margin-bottom: 20px;
+    background: radial-gradient(circle at center top, rgba(255, 215, 0, 0.12), transparent 60%);
+  }
+  .movies-title {
+    font-size: 3.5rem; font-weight: 900; color: #fff; margin-bottom: 15px; letter-spacing: -1px;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    background: linear-gradient(to bottom, #ffffff, #e0e0e0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .movies-subtitle { color: rgba(255, 255, 255, 0.7); font-size: 1.2rem; font-weight: 400; max-width: 700px; margin: 0 auto; }
+
+  /* BUSCADOR */
+  .search-container { max-width: 700px; margin: 20px auto 60px; position: relative; z-index: 2; }
+  .search-input {
+    background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 215, 0, 0.25);
+    color: #fff; border-radius: 50px; padding: 18px 30px 18px 60px; width: 100%; font-size: 1.1rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2); transition: all 0.4s ease;
+  }
+  .search-input:focus { background: rgba(255, 255, 255, 0.1); border-color: #FFD700; outline: none; box-shadow: 0 0 35px rgba(255, 215, 0, 0.2); }
+  .search-btn { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #FFD700; font-size: 1.4rem; cursor: pointer; }
+
+  /* --- ZONA DE PENDIENTES (ADMIN) --- */
+  .pending-section {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(255, 215, 0, 0.02) 100%);
+    border: 2px solid #FFD700; border-radius: 12px; overflow: hidden; margin: 40px auto; max-width: 1400px;
+  }
+  .pending-header { background: linear-gradient(90deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.05) 100%); padding: 20px 25px; border-bottom: 1px solid rgba(255, 215, 0, 0.3); color: #FFD700; font-weight: 800; }
+  .table-custom { width: 100%; border-collapse: collapse; color: #fff; }
+  .table-custom th { background: #0a0a0a; color: rgba(255, 215, 0, 0.6); padding: 15px 20px; }
+  .table-custom td { padding: 15px 20px; border-bottom: 1px solid rgba(255, 215, 0, 0.1); vertical-align: middle; }
+  .btn-icon-action { width: 38px; height: 38px; border: 1.5px solid #FFD700; color: #FFD700; background: transparent; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+  
+  /* MODAL */
+  .modal-content-dark { background-color: #141414; border: 1px solid rgba(255, 215, 0, 0.2); color: #fff; }
+  .form-control-modal { background: #000; border: 1px solid #333; color: white; }
+  
+  /* --- CATEGORIAS Y CARRUSEL --- */
+  .category-title-row { color: #fff; font-size: 1.5rem; font-weight: 800; padding-left: 60px; margin-top: 50px; display: flex; align-items: center; gap: 10px; }
+  .category-decorator { width: 4px; height: 25px; background-color: #FFD700; display: inline-block; }
+  
+  .carousel-container { max-width: 1700px; margin: 0 auto; padding: 0 60px; position: relative; }
+  .carousel-wrapper { overflow: hidden; border-radius: 8px; position: relative; }
+  .movies-carousel { display: flex; gap: 20px; padding: 20px 0; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; }
+  .movies-carousel::-webkit-scrollbar { display: none; }
+  
+  .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,215,0,0.9); width: 45px; height: 45px; border-radius: 50%; z-index: 15; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+  .carousel-btn.visible { opacity: 1; pointer-events: auto; }
+  .carousel-btn.left { left: 10px; } .carousel-btn.right { right: 10px; }
+
+  /* --- TARJETAS DE PELÍCULAS --- */
+  .movie-card { 
+      /* Por defecto ancho fijo para carrusel */
+      width: 180px; 
+      flex-shrink: 0; cursor: pointer; transition: transform 0.3s; position: relative; border-radius: 12px; overflow: hidden; 
+  }
+  .movie-card:hover { transform: scale(1.05); z-index: 5; }
+  .poster-container { aspect-ratio: 2/3; overflow: hidden; position: relative; background-color: #111; }
+  .poster-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
+  
+  /* Overlay mejorado para legibilidad */
+  .movie-overlay { 
+      position: absolute; bottom: 0; left: 0; width: 100%; 
+      padding: 30px 10px 15px; 
+      background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
+  }
+  .movie-title { font-size: 0.95rem; font-weight: bold; color: white; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,1); }
+  
+  /* --- ARREGLO DE LA CUADRÍCULA DE BÚSQUEDA --- */
+  .movies-grid { 
+      display: grid; 
+      /* Aumentamos el tamaño mínimo a 200px para que se vean bien */
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+      gap: 40px; 
+      padding: 0 40px; 
+      max-width: 1600px; 
+      margin: 0 auto; 
+  }
+  
+  /* Cuando la tarjeta está dentro de una grid, ocupa todo el ancho de la celda */
+  .movies-grid .movie-card {
+      width: 100%; 
+  }
+  
+  /* FABs */
+  .fab-container { position: fixed; bottom: 40px; right: 40px; z-index: 999; }
+  .fab-add-movie, .fab-request-movie { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; text-decoration: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .fab-add-movie { background: #FFD700; color: #000; }
+  .fab-request-movie { background: #00B4D8; color: #fff; }
+
+  /* CTA GUEST */
+  .guest-floating-cta { position: fixed; bottom: 30px; right: 30px; max-width: 400px; background: rgba(15,15,15,0.95); border: 1px solid rgba(255,215,0,0.3); padding: 20px; border-radius: 12px; z-index: 1000; }
+  .guest-cta-header { display: flex; align-items: center; gap: 15px; }
+  .guest-cta-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #FFD700, #FFA500); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #000; }
+  .guest-cta-text h4 { color: #fff; font-weight: 800; font-size: 1rem; margin: 0; }
+  .guest-cta-text p { color: rgba(255,255,255,0.7); font-size: 0.85rem; margin: 3px 0 0; }
+  .btn-cta-glow { background: #FFD700; color: #000; padding: 10px; border-radius: 8px; display: block; text-align: center; text-decoration: none; font-weight: bold; margin-top: 10px; }
+  .cta-close { position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: rgba(255,255,255,0.3); cursor: pointer; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="movies-wrapper">
+    <div class="movies-header">
+        <h1 class="movies-title">Descubre tu Próxima Película</h1>
+        <p class="movies-subtitle">Ve a nuestras recomendaciones o IA y encuentra tu próxima película.</p>
+    </div>
+
+    {% if current_user.is_authenticated and current_user.is_admin and pending_requests %}
+    <div id="pending_section" class="pending-section">
+        <div class="pending-header"><i class="bi bi-bell-fill me-2"></i> Solicitudes Pendientes ({{ pending_requests|length }})</div>
+        <div style="overflow-x: auto;">
+            <table class="table-custom">
+                <thead>
+                    <tr><th style="padding-left: 30px;">Portada</th><th>Título</th><th>Usuario</th><th style="text-align: right; padding-right: 30px;">Revisar</th></tr>
+                </thead>
+                <tbody>
+                    {% for req in pending_requests %}
+                    <tr>
+                        <td style="padding-left: 30px;">
+                            {% if req.poster %}
+                                <img src="{{ url_for('static', filename=req.poster) }}" style="width: 40px; height: 60px; object-fit: cover; border-radius: 4px;">
+                            {% else %}
+                                <div style="width: 40px; height: 60px; background: #222;"></div>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold">{{ req.title }}</td>
+                        <td style="color: #888;">{{ req.user.username }}</td>
+                        <td style="text-align: right; padding-right: 30px;">
+                            <button class="btn-icon-action ms-auto" data-bs-toggle="modal" data-bs-target="#modalReview{{ req.id }}"><i class="bi bi-pencil-square"></i></button>
+                        </td>
+                    </tr>
+
+                    <div class="modal fade" id="modalReview{{ req.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                            <div class="modal-content modal-content-dark">
+                                <div class="modal-header border-bottom border-secondary p-4">
+                                    <h5 class="modal-title fw-bold">REVISAR SOLICITUD</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body p-4">
+                                    <form action="{{ url_for('movies.approve_request', request_id=req.id) }}" method="POST" id="formApprove{{ req.id }}">
+                                        <div class="row">
+                                            <div class="col-md-4 text-center">
+                                                <label class="small text-warning fw-bold mb-2 d-block text-start">PORTADA</label>
+                                                <div style="background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #333; height: 300px; display: flex; align-items: center; justify-content: center;">
+                                                    {% if req.poster %}
+                                                        <img src="{{ url_for('static', filename=req.poster) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                                    {% else %}
+                                                        <div class="text-white-50"><i class="bi bi-image fs-1"></i><br>Sin imagen</div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="mb-3">
+                                                    <label class="small text-warning fw-bold mb-1">TÍTULO</label>
+                                                    <input type="text" class="form-control form-control-modal" id="title_{{ req.id }}" name="title" value="{{ req.title }}">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="small text-warning fw-bold mb-1">SINOPSIS</label>
+                                                    <textarea class="form-control form-control-modal" name="description" rows="4">{{ req.description }}</textarea>
+                                                </div>
+                                                <div>
+                                                    <label class="small text-warning fw-bold mb-1">TRAILER URL</label>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control form-control-modal" id="trailer_{{ req.id }}" name="trailer_url" value="{{ req.trailer_url or '' }}" placeholder="https://...">
+                                                        <button type="button" class="btn btn-outline-warning" onclick="findTrailerInModal('{{ req.id }}')"><i class="bi bi-magic"></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer border-top border-secondary p-4 justify-content-between">
+                                    <form action="{{ url_for('movies.reject_request', request_id=req.id) }}" method="POST">
+                                        <button class="btn btn-outline-danger px-4">Rechazar</button>
+                                    </form>
+                                    <button type="submit" form="formApprove{{ req.id }}" class="btn fw-bold px-4" style="background-color: #FFD700; color: #000;">Aprobar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="search-container">
+        <form method="GET" action="{{ url_for('movies.list_movies') }}">
+            <input type="text" name="search" class="search-input" placeholder="Buscar..." value="{{ search or '' }}">
+            <button type="submit" class="search-btn"><i class="bi bi-search"></i></button>
+        </form>
+    </div>
+
+    {% if view_mode == 'grid' %}
+        <div class="text-center text-white mb-5">
+            <h3 class="fw-light">Resultados para: <span class="text-warning fw-bold">"{{ search }}"</span></h3>
+        </div>
+        <div class="movies-grid">
+            {% for movie in movies %}
+                <div class="movie-card" data-movie-id="{{ movie.id }}">
+                    <div class="poster-container">
+                        {% if movie.poster %}<img src="{{ url_for('static', filename=movie.poster) }}" class="poster-img">{% else %}<div class="bg-dark text-white-50 d-flex align-items-center justify-content-center h-100"><i class="bi bi-film fs-1"></i></div>{% endif %}
+                    </div>
+                    <div class="movie-overlay"><div class="movie-title">{{ movie.title }}</div></div>
+                </div>
+            {% else %}
+                <div class="text-center w-100 text-white-50 py-5">
+                    <i class="bi bi-emoji-dizzy fs-1 mb-3 d-block"></i>
+                    No se encontraron resultados. Intenta con otro título.
+                </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        {% for category in categories %}
+            <div class="category-title-row"><div class="category-decorator"></div>{{ category.title }}</div>
+            <div class="carousel-container">
+                <div class="carousel-wrapper">
+                    <button class="carousel-btn left"><i class="bi bi-chevron-left"></i></button>
+                    <div class="movies-carousel">
+                        {% for movie in category.movies %}
+                            <div class="movie-card" data-movie-id="{{ movie.id }}">
+                                <div class="poster-container">
+                                    {% if movie.poster %}<img src="{{ url_for('static', filename=movie.poster) }}" class="poster-img" loading="lazy">{% else %}<div class="bg-dark text-white-50 d-flex align-items-center justify-content-center h-100"><i class="bi bi-film"></i></div>{% endif %}
+                                </div>
+                                <div class="movie-overlay"><div class="movie-title">{{ movie.title }}</div></div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-btn right"><i class="bi bi-chevron-right"></i></button>
+                </div>
+            </div>
+        {% endfor %}
+        
+        {% if not categories %}
+            <div class="text-center py-5 text-white-50">
+                <i class="bi bi-film display-1 mb-3"></i>
+                <p>El catálogo está vacío o no hay recomendaciones disponibles.</p>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+<div class="fab-container">
+    {% if current_user.is_authenticated %}
+        {% if current_user.is_admin %}
+            <a href="{{ url_for('movies.add_movie') }}" class="fab-add-movie" title="Añadir"><i class="bi bi-plus-lg"></i></a>
+        {% else %}
+            <a href="{{ url_for('movies.add_movie') }}" class="fab-request-movie" title="Solicitar"><i class="bi bi-plus-circle"></i></a>
+        {% endif %}
+    {% endif %}
+</div>
+
+{% if not current_user.is_authenticated %}
+<div class="guest-floating-cta" id="guestCta">
+    <button class="cta-close" onclick="document.getElementById('guestCta').style.display='none'"><i class="bi bi-x-lg"></i></button>
+    <div class="guest-cta-header">
+        <div class="guest-cta-icon"><i class="bi bi-stars"></i></div>
+        <div class="guest-cta-text"><h4>Descubre tu próxima joya</h4><p>IA personalizada.</p></div>
+    </div>
+    <a href="{{ url_for('users.register') }}" class="btn-cta-glow">Crear cuenta gratis</a>
+</div>
+{% endif %}
+
+<script>
+    async function findTrailerInModal(id) {
+        const title = document.getElementById('title_' + id).value;
+        const trailerInput = document.getElementById('trailer_' + id);
+        if(!title) return;
+        trailerInput.placeholder = "Buscando...";
+        try {
+            const res = await fetch("{{ url_for('movies.find_trailer_api') }}", {
+                method: "POST", headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ title: title })
+            });
+            const data = await res.json();
+            if(data.success) trailerInput.value = data.url;
+            else trailerInput.placeholder = "No encontrado";
+        } catch(e) { console.error(e); }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.carousel-container').forEach(c => {
+            const row = c.querySelector('.movies-carousel');
+            const l = c.querySelector('.left'), r = c.querySelector('.right');
+            if(!row) return;
+            const upd = () => {
+                l.classList.toggle('visible', row.scrollLeft > 0);
+                r.classList.toggle('visible', Math.ceil(row.scrollLeft + row.clientWidth) < row.scrollWidth);
+            };
+            l.onclick = () => row.scrollBy({left:-220, behavior:'smooth'});
+            r.onclick = () => row.scrollBy({left:220, behavior:'smooth'});
+            row.onscroll = upd; window.onresize = upd; setTimeout(upd, 100);
+        });
+        
+        document.querySelectorAll('.movie-card').forEach(c => {
+            c.onclick = () => window.location.href = '/movies/view/' + c.dataset.movieId;
+        });
+    });
+</script>
+{% endblock %} 

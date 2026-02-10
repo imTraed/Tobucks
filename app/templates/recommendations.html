@@ -1,0 +1,408 @@
+{% extends 'base.html' %}
+
+{% block title %}Para Ti - Tobucks{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.css"></script>
+<script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+<style>
+  /* --- ESTILOS DE LA LISTA (IZQUIERDA) --- */
+  
+  /* Contenedor con scroll propio para la lista */
+  .rec-list-wrapper {
+      max-height: 700px; /* Altura alineada con el grafo */
+      overflow-y: auto;
+      padding-right: 10px; /* Espacio para el scroll */
+      padding-bottom: 20px;
+  }
+
+  /* Scrollbar personalizado fino y dorado */
+  .rec-list-wrapper::-webkit-scrollbar { width: 6px; }
+  .rec-list-wrapper::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+  .rec-list-wrapper::-webkit-scrollbar-thumb { background: #FFD700; border-radius: 10px; }
+
+  /* TARJETA DE VIDRIO (GLASSMORPHISM) */
+  .rec-card {
+      display: grid;
+      grid-template-columns: 90px 1fr; /* Imagen fija - Info flexible */
+      gap: 15px;
+      background: rgba(255, 255, 255, 0.03); /* Fondo muy sutil */
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 15px;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+  }
+
+  /* Efecto Hover: Elevación y Borde Dorado */
+  .rec-card:hover {
+      background: rgba(255, 215, 0, 0.05); /* Tinte dorado ultra suave */
+      border-color: rgba(255, 215, 0, 0.4);
+      transform: translateY(-3px) translateX(3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  /* Imagen Poster */
+  .rec-poster {
+      width: 100%;
+      height: 135px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+      transition: transform 0.3s ease;
+  }
+  .rec-card:hover .rec-poster { transform: scale(1.05); }
+
+  .rec-poster-placeholder {
+      width: 100%; height: 135px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.2); font-size: 2rem;
+  }
+
+  /* Info */
+  .rec-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-right: 10px;
+  }
+
+  .rec-title {
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+      line-height: 1.2;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+
+  .rec-meta {
+      font-size: 0.7rem;
+      color: #FFD700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      font-weight: 700;
+      opacity: 0.9;
+  }
+
+  .rec-desc {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.8rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3; /* Solo 3 líneas de texto */
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.5;
+      margin: 0;
+  }
+
+  /* Loader para Scroll Infinito */
+  .loading-indicator {
+      text-align: center;
+      padding: 20px;
+      display: none; /* Oculto por defecto */
+  }
+  .spinner-border { width: 2rem; height: 2rem; color: #FFD700; }
+
+
+  /* --- TUS ESTILOS DEL GRAFO (DERECHA) - INTACTOS --- */
+  #graphCard { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+  
+  .fullscreen-mode {
+    position: fixed !important; top: 0; left: 0;
+    width: 100vw !important; height: 100vh !important;
+    z-index: 9999; border-radius: 0 !important; border: none !important;
+  }
+  
+  .maximize-btn {
+    position: absolute; bottom: 20px; right: 20px; z-index: 10;
+    background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; border-radius: 8px; padding: 8px 12px;
+    transition: all 0.2s; cursor: pointer;
+  }
+  .maximize-btn:hover { background: #FFD700; color: #000; border-color: #FFD700; }
+
+  @keyframes starFlow {
+    from { background-position: 0 0, 0 0; }
+    to { background-position: -1000px 500px, -500px 1000px; }
+  }
+  #network {
+    background-color: #050505;
+    background-image: 
+        radial-gradient(white, rgba(255,255,255,.2) 1px, transparent 2px),
+        radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+    background-size: 400px 400px, 250px 250px;
+    animation: starFlow 120s linear infinite;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 pb-3">
+
+  <div class="mb-4 mt-3 d-flex align-items-end justify-content-between border-bottom border-secondary border-opacity-25 pb-3">
+    <div>
+        <h6 class="text-secondary text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 2px; font-weight: 700;">Inteligencia Artificial</h6>
+        <h1 class="display-5 fw-bolder text-white m-0">Recomendaciones<span class="text-warning">.</span></h1>
+    </div>
+    <div class="d-none d-md-block text-end">
+        <span class="text-white-50 small"></i>Explora tu universo personal</span>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    
+    <div class="col-lg-6 col-xl-5">
+      
+      {% if recommendations %}
+      <div class="rec-list-wrapper" id="recommendationsList">
+        {% for movie in recommendations %}
+        <a href="{{ url_for('movies.view_movie', movie_id=movie.id) }}" class="rec-card">
+            
+            <div class="position-relative">
+                {% if movie.poster %}
+                <img src="{{ url_for('static', filename=movie.poster) }}" class="rec-poster" alt="{{ movie.title }}">
+                {% else %}
+                <div class="rec-poster-placeholder"><i class="bi bi-film"></i></div>
+                {% endif %}
+            </div>
+            
+            <div class="rec-info">
+                <h5 class="rec-title">{{ movie.title }}</h5>
+                <div class="rec-meta">
+                    {% for genre in movie.genres[:2] %}
+                    {{ genre.name }}{% if not loop.last %} • {% endif %}
+                    {% endfor %}
+                </div>
+                <p class="rec-desc">{{ movie.description }}</p>
+            </div>
+
+        </a>
+        {% endfor %}
+        
+        <div class="loading-indicator" id="loadingIndicator">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+      </div>
+
+      {% else %}
+        <div class="alert alert-dark border-secondary border-opacity-25 py-5 text-center rounded-3">
+           <h4 class="text-white-50">Sin datos suficientes para generar recomendaciones.</h4>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="col-lg-6 col-xl-7">
+      <div class="sticky-top" style="top: 20px; z-index: 1;">
+        
+        <div id="graphCard" class="card bg-dark border border-warning border-opacity-25 shadow-lg h-100 rounded-3 overflow-hidden">
+           
+           <div class="card-header bg-dark border-bottom border-secondary border-opacity-25 py-2 d-flex align-items-center justify-content-between">
+               <h6 class="m-0 text-white fw-bold small"><i class="bi bi-diagram-3-fill text-warning me-2"></i>Universo de Gustos</h6>
+               <span class="badge bg-secondary bg-opacity-25 text-white-50 rounded-pill" style="font-size: 0.6rem;">Interactivo</span>
+           </div>
+           
+           <div class="card-body p-0 position-relative" style="height: 650px;"> 
+               <div id="network" style="width: 100%; height: 100%;"></div>
+               
+               <div class="position-absolute bottom-0 start-0 p-3 text-white-50 small pe-none opacity-50" style="z-index: 5;">
+                 <i class="bi bi-mouse me-1"></i> Arrastra y explora
+               </div>
+
+               <button onclick="toggleFullscreen()" class="maximize-btn" title="Pantalla Completa">
+                 <i class="bi bi-arrows-fullscreen" id="maxIcon"></i>
+               </button>
+           </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+    /* --- LÓGICA DE SCROLL INFINITO (PREPARADA) --- */
+    document.addEventListener("DOMContentLoaded", function() {
+        const listWrapper = document.getElementById('recommendationsList');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        let page = 2; // Empezamos en la página 2 porque la 1 ya se renderizó
+        let isLoading = false;
+        let hasMore = true; // Asumimos que hay más hasta que el servidor diga lo contrario
+
+        listWrapper.addEventListener('scroll', () => {
+            // Verificamos si el usuario ha llegado al final del scroll
+            if (listWrapper.scrollTop + listWrapper.clientHeight >= listWrapper.scrollHeight - 50) {
+                if (!isLoading && hasMore) {
+                    loadMoreMovies();
+                }
+            }
+        });
+
+        async function loadMoreMovies() {
+            isLoading = true;
+            loadingIndicator.style.display = 'block';
+
+            try {
+                // NOTA: Necesitas crear una ruta '/api/recommendations' en tu backend que devuelva JSON
+                // Por ahora, esto intentará cargar pero fallará silenciosamente si la ruta no existe
+                // Para que funcione completamente, debes implementar esa ruta API.
+                const response = await fetch(`{{ url_for('recommendations.recommendations') }}?page=${page}&json=true`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.movies && data.movies.length > 0) {
+                        data.movies.forEach(movie => {
+                            const cardHTML = createMovieCard(movie);
+                            // Insertar antes del loader
+                            loadingIndicator.insertAdjacentHTML('beforebegin', cardHTML);
+                        });
+                        page++;
+                    } else {
+                        hasMore = false; // No hay más películas
+                    }
+                } else {
+                    // Si no es una respuesta JSON válida o error, detenemos intentos
+                    hasMore = false; 
+                }
+            } catch (error) {
+                console.error("Error cargando más películas:", error);
+                hasMore = false;
+            } finally {
+                isLoading = false;
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        function createMovieCard(movie) {
+            // Función auxiliar para generar el HTML de la tarjeta
+            // Asegúrate de que las rutas de imagen coincidan con tu estructura
+            const posterSrc = movie.poster ? `{{ url_for('static', filename='') }}${movie.poster}` : '';
+            const posterDiv = movie.poster 
+                ? `<img src="${posterSrc}" class="rec-poster" alt="${movie.title}">`
+                : `<div class="rec-poster-placeholder"><i class="bi bi-film"></i></div>`;
+            
+            // Construir géneros
+            let genresHtml = '';
+            if (movie.genres) {
+                genresHtml = movie.genres.slice(0, 2).map(g => g.name).join(' • ');
+            }
+
+            return `
+            <a href="/movies/view/${movie.id}" class="rec-card">
+                <div class="position-relative">
+                    ${posterDiv}
+                </div>
+                <div class="rec-info">
+                    <h5 class="rec-title">${movie.title}</h5>
+                    <div class="rec-meta">${genresHtml}</div>
+                    <p class="rec-desc">${movie.description || ''}</p>
+                </div>
+            </a>
+            `;
+        }
+    });
+
+    /* --- LÓGICA DEL GRAFO (ORIGINAL) --- */
+    try {
+        var nodes = new vis.DataSet({{ nodes | tojson }});
+        var edges = new vis.DataSet({{ edges | tojson }});
+    } catch (error) {
+        var nodes = new vis.DataSet([]);
+        var edges = new vis.DataSet([]);
+    }
+
+    var container = document.getElementById('network');
+    var data = { nodes: nodes, edges: edges };
+
+    var options = {
+        nodes: {
+            borderWidth: 2,
+            borderWidthSelected: 4,
+            shapeProperties: { useBorderWithImage: true },
+            font: { color: '#ffffff', face: 'Segoe UI' }
+        },
+        edges: {
+            smooth: false,
+            width: 2,
+            color: {
+                color: 'rgba(255, 255, 255, 0.9)', 
+                highlight: '#FFD700',
+                opacity: 1.0
+            }
+        },
+        physics: {
+            solver: 'forceAtlas2Based',
+            forceAtlas2Based: {
+                gravitationalConstant: -200,
+                centralGravity: 0.005,
+                springLength: 180,            
+                springConstant: 0.05,
+                damping: 0.9
+            },
+            stabilization: {
+                enabled: true,
+                iterations: 1000,
+                updateInterval: 25
+            },
+            minVelocity: 0.1
+        },
+        interaction: {
+            hover: true,
+            zoomView: true,
+            dragNodes: true
+        }
+    };
+
+    var network = new vis.Network(container, data, options);
+
+    container.style.cursor = 'crosshair';
+    network.on("hoverNode", function () { container.style.cursor = 'pointer'; });
+    network.on("blurNode", function () { container.style.cursor = 'crosshair'; });
+    network.on("dragStart", function () { container.style.cursor = 'grabbing'; });
+    network.on("dragEnd", function () { container.style.cursor = 'crosshair'; });
+
+    network.once("afterDrawing", function() {
+        network.moveTo({ position: {x: 0, y: 0}, scale: 1.0, animation: false });
+        setTimeout(function() {
+             network.focus('user_node', { scale: 1.0, animation: false });
+        }, 50); 
+    });
+
+    function toggleFullscreen() {
+        var card = document.getElementById('graphCard');
+        var icon = document.getElementById('maxIcon');
+        
+        card.classList.toggle('fullscreen-mode');
+        var isFullscreen = card.classList.contains('fullscreen-mode');
+
+        if (isFullscreen) {
+            icon.classList.remove('bi-arrows-fullscreen');
+            icon.classList.add('bi-fullscreen-exit');
+        } else {
+            icon.classList.remove('bi-fullscreen-exit');
+            icon.classList.add('bi-arrows-fullscreen');
+        }
+        
+        setTimeout(function(){
+            network.redraw(); 
+            if (isFullscreen) {
+                network.fit({ animation: { duration: 1500, easingFunction: "easeInOutQuad" } });
+            } else {
+                network.focus('user_node', { scale: 1.8, animation: { duration: 1000, easingFunction: "easeInOutQuad" }}); 
+            }
+        }, 550);
+    }
+</script>
+
+{% endblock %}

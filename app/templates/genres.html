@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Géneros - Tobucks{% endblock %}
+
+{% block content %}
+<div class="container pb-5">
+  
+  <div class="d-flex justify-content-between align-items-end mb-5 mt-4">
+    <div>
+      <h6 class="text-secondary text-uppercase mb-1" style="font-size: 0.8rem; letter-spacing: 2px;">Administración</h6>
+      <h1 class="display-5 fw-bold text-white m-0">Géneros<span class="text-warning">.</span></h1>
+    </div>
+    
+    <a href="{{ url_for('genres.add_genre') }}" class="btn btn-warning rounded-pill px-4 fw-bold shadow-gold-sm">
+      <i class="bi bi-plus-lg me-2"></i>Nuevo Género
+    </a>
+  </div>
+
+  {% if genres %}
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+      
+      {% for genre in genres %}
+      <div class="col">
+        <div class="genre-tile h-100 position-relative d-flex flex-column justify-content-between p-4 rounded-3">
+          
+          <div class="text-center flex-grow-1 d-flex align-items-center justify-content-center mb-3">
+            <h4 class="m-0 fw-bold text-uppercase text-white tracking-wider text-break">
+              {{ genre.name }}
+            </h4>
+          </div>
+          
+          <div class="action-bar d-flex justify-content-center gap-3 pt-3 border-top border-secondary border-opacity-25">
+            <a href="{{ url_for('genres.edit_genre', genre_id=genre.id) }}" class="text-secondary hover-gold text-decoration-none" title="Editar nombre">
+              <i class="bi bi-pencil-square fs-5"></i>
+            </a>
+            
+            <form action="{{ url_for('genres.delete_genre', genre_id=genre.id) }}" method="post">
+              <button type="submit" class="btn btn-link p-0 text-secondary hover-danger border-0" title="Eliminar género" onclick="return confirm('¿Seguro que deseas eliminar el género {{ genre.name }}? Esto podría afectar a las películas asociadas.');">
+                <i class="bi bi-trash fs-5"></i>
+              </button>
+            </form>
+          </div>
+
+          <i class="bi bi-tag-fill position-absolute top-0 end-0 m-2 text-white opacity-5" style="font-size: 1.5rem;"></i>
+
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+
+    <div class="pagination-container text-center mt-5">
+      <div class="d-inline-flex bg-dark rounded-pill border border-secondary border-opacity-25 p-1 align-items-center shadow-lg">
+        {% if current_page > 1 %}
+          <a href="{{ url_for('genres.list_genres', page=current_page - 1) }}" class="btn btn-icon btn-outline-light rounded-circle border-0 me-2">
+            <i class="bi bi-chevron-left"></i>
+          </a>
+        {% endif %}
+
+        <span class="fw-bold px-3 text-warning font-monospace">PÁG {{ current_page }}</span>
+
+        {% if current_page < total_pages %}
+          <a href="{{ url_for('genres.list_genres', page=current_page + 1) }}" class="btn btn-icon btn-outline-light rounded-circle border-0 ms-2">
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+  {% else %}
+    <div class="alert alert-dark border-secondary border-opacity-25 text-center py-5 rounded-4 mt-4">
+      <i class="bi bi-tags text-secondary display-4 mb-3 d-block"></i>
+      <h4 class="text-white">No hay géneros registrados</h4>
+      <p class="text-secondary">Comienza añadiendo categorías para tus películas.</p>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block head %}
+<style>
+  /* --- ESTILOS DE GÉNEROS (TILES) --- */
+
+  /* 1. La Tarjeta (Tile) */
+  .genre-tile {
+    background: linear-gradient(145deg, #1f1f1f, #141414); /* Degradado sutil oscuro */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  }
+
+  /* 2. Efecto Hover (Brillo Dorado) */
+  .genre-tile:hover {
+    transform: translateY(-5px);
+    border-color: #FFD700; /* Borde dorado */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 15px rgba(255, 215, 0, 0.1); /* Resplandor */
+  }
+
+  /* Al pasar el mouse, el texto también brilla un poco */
+  .genre-tile:hover h4 {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+
+  /* 3. Tipografía */
+  .tracking-wider { letter-spacing: 2px; }
+  .opacity-5 { opacity: 0.05; }
+
+  /* 4. Botones de Acción */
+  .hover-gold:hover { color: #FFD700 !important; transform: scale(1.1); }
+  .hover-danger:hover { color: #dc3545 !important; transform: scale(1.1); }
+  
+  /* Transición suave para iconos */
+  .action-bar a, .action-bar button { transition: all 0.2s ease; }
+
+  /* 5. Botón Paginación */
+  .btn-icon {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .shadow-gold-sm { box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2); }
+</style>
+{% endblock %}

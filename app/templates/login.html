@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Iniciar Sesión - Tobucks{% endblock %}
+
+{% block head %}
+<style>
+    /* --- FONDO CINEMÁTICO --- */
+    body {
+        background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+        height: 100vh;
+        overflow: hidden; /* Evita scroll en login */
+    }
+
+    /* --- CONTENEDOR CENTRAL --- */
+    .login-wrapper {
+        height: 100vh; /* Ocupa toda la pantalla - altura del nav */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: 20px;
+    }
+
+    /* Fondo de luces animadas (Opcional, para dar vida) */
+    .ambient-light {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        animation: pulse 5s infinite ease-in-out;
+    }
+
+    /* --- TARJETA DE CRISTAL (GLASSMORPHISM) --- */
+    .login-card {
+        width: 100%;
+        max-width: 420px;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        position: relative;
+        z-index: 10;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    /* --- TIPOGRAFÍA --- */
+    .login-brand {
+        font-family: 'Impact', sans-serif; /* O tu fuente de logo */
+        font-size: 2.5rem;
+        color: #FFD700;
+        text-align: center;
+        margin-bottom: 5px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .login-subtitle {
+        color: rgba(255, 255, 255, 0.6);
+        text-align: center;
+        font-size: 0.9rem;
+        margin-bottom: 30px;
+        font-weight: 300;
+    }
+
+    /* --- ALERTAS PERSONALIZADAS (ELIMINANDO EL POPUP FEO) --- */
+    .custom-alert {
+        background: rgba(255, 215, 0, 0.1);
+        border-left: 4px solid #FFD700;
+        color: #fff;
+        padding: 12px 15px;
+        border-radius: 4px;
+        margin-bottom: 25px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: fadeIn 0.5s;
+    }
+    .custom-alert.error { border-color: #ff4d4d; background: rgba(255, 77, 77, 0.1); }
+    .custom-alert i { font-size: 1.1rem; }
+
+    /* --- INPUTS --- */
+    .input-group-text {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-right: none;
+        color: #FFD700;
+    }
+
+    .form-control-premium {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-left: none;
+        color: white;
+        padding: 12px;
+        transition: all 0.3s;
+    }
+
+    .form-control-premium:focus {
+        background-color: rgba(0, 0, 0, 0.5);
+        box-shadow: none;
+        border-color: #FFD700;
+        color: white;
+    }
+    
+    /* Arreglar borde al enfocar el input para que se ilumine el icono también */
+    .input-group:focus-within .input-group-text {
+        border-color: #FFD700;
+    }
+
+    .form-label {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    /* --- BOTÓN --- */
+    .btn-login {
+        width: 100%;
+        background: linear-gradient(135deg, #FFD700 0%, #FFC700 100%);
+        border: none;
+        padding: 14px;
+        font-weight: 800;
+        color: #000;
+        border-radius: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 10px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        background: #ffe033;
+        color: #000;
+    }
+
+    /* --- FOOTER LINKS --- */
+    .login-footer {
+        text-align: center;
+        margin-top: 25px;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.5);
+    }
+    .login-footer a {
+        color: #FFD700;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+    .login-footer a:hover { color: #fff; }
+
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+    <div class="ambient-light"></div>
+
+    <div class="login-card">
+        <div class="login-brand">TOBUCKS</div>
+        <p class="login-subtitle">Tu entrada al universo del cine</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="custom-alert {% if category == 'danger' or category == 'error' %}error{% endif %}">
+                        {% if category == 'danger' or category == 'error' %}
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        {% else %}
+                            <i class="bi bi-info-circle-fill"></i>
+                        {% endif %}
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="">
+            <div class="mb-4">
+                <label class="form-label">Usuario</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                    <input type="text" name="username" class="form-control form-control-premium" placeholder="Ingresa tu usuario" required autofocus>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Contraseña</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <input type="password" name="password" class="form-control form-control-premium" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-login">
+                Iniciar Sesión
+            </button>
+        </form>
+
+        <div class="login-footer">
+            ¿No tienes una cuenta? <a href="{{ url_for('users.register') }}">Regístrate aquí</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

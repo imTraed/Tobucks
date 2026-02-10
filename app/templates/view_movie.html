@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    /* --- COLORES PERSONALIZADOS --- */
+    :root {
+      --gold-color: #FFD700;
+    }
+
+    /* --- FONDO INMERSIVO A PANTALLA COMPLETA --- */
+    body, html {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        background-color: #000; /* Fallback */
+    }
+
+    /* Imagen de fondo fija */
+    .fixed-backdrop-image {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-size: cover;
+      background-position: center;
+      filter: blur(30px) brightness(0.5);
+      z-index: -2;
+      transform: scale(1.1);
+    }
+
+    /* Capa oscura fija */
+    .fixed-backdrop-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(
+        to right, 
+        rgba(0,0,0, 0.95) 10%, 
+        rgba(0,0,0, 0.8) 40%, 
+        rgba(0,0,0, 0.4) 100%
+      );
+      z-index: -1;
+    }
+
+    /* Contenedor principal */
+    .content-container {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 4rem 2rem;
+    }
+    
+    /* --- ESTILOS --- */
+    .text-gold { color: var(--gold-color) !important; }
+    .border-gold { border-color: var(--gold-color) !important; }
+    .text-shadow-lg { text-shadow: 3px 3px 6px rgba(0,0,0,0.9); }
+
+    /* --- BOTONES --- */
+    .btn-gold {
+      background-color: var(--gold-color);
+      color: #000;
+      border: 2px solid var(--gold-color);
+      font-weight: 800;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .btn-gold:hover {
+      background-color: #ffe066;
+      border-color: #ffe066;
+      color: #000;
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(255, 215, 0, 0.4);
+    }
+
+    /* Nuevo estilo: Botón borde dorado (No visto) */
+    .btn-outline-gold {
+      background-color: transparent;
+      color: var(--gold-color);
+      border: 2px solid var(--gold-color);
+      font-weight: 800;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-gold:hover {
+      background-color: var(--gold-color);
+      color: #000;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    }
+    
+    /* --- PÓSTER --- */
+    .poster-frame img {
+      box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+      transition: transform 0.5s cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    }
+    .poster-frame img:hover {
+      transform: scale(1.03) translateY(-5px);
+    }
+
+    /* --- TRAILER --- */
+    .trailer-wrapper {
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #000;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        transition: all 0.3s ease;
+        margin-bottom: 2rem;
+    }
+
+    .trailer-wrapper:hover {
+        border-color: var(--gold-color);
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    /* --- UTILIDADES --- */
+    .hover-text-gold:hover { color: var(--gold-color) !important; }
+    .transition-base { transition: all 0.3s ease; }
+  </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="fixed-backdrop-image"
+     style="background-image: url('{% if movie.poster %}{{ url_for('static', filename=movie.poster) }}{% else %}{{ url_for('static', filename='img/default-movie.png') }}{% endif %}');">
+</div>
+<div class="fixed-backdrop-overlay"></div>
+
+<div class="content-container container-fluid">
+  <div class="row justify-content-center align-items-center">
+    <div class="col-xl-10">
+      
+    <a href="{{ url_for('movies.list_movies') }}" 
+       onclick="history.back(); return false;" 
+       class="text-white text-decoration-none mb-5 d-inline-flex align-items-center hover-text-gold transition-base">
+    <i class="bi bi-arrow-left fs-4 me-3"></i>
+    <span class="fs-5 fw-bold text-uppercase" style="letter-spacing: 2px;">Volver</span>
+    </a>
+
+      <div class="row align-items-center">
+        
+        <div class="col-md-5 col-lg-4 mb-5 mb-md-0 text-center text-md-start">
+          <div class="poster-frame">
+            {% if movie.poster %}
+              <img src="{{ url_for('static', filename=movie.poster) }}" alt="{{ movie.title }}" class="img-fluid rounded-4" style="max-height: 650px; width: auto;">
+            {% else %}
+              <div class="d-flex align-items-center justify-content-center bg-dark text-white-50 rounded-4 border border-secondary" style="height: 500px; width: 350px; max-width: 100%;">
+                <div class="text-center">
+                  <i class="bi bi-film fs-1 mb-3 d-block"></i>
+                  <span class="fw-bold fs-5">SIN PORTADA</span>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-7 col-lg-8 text-white ps-md-5">
+          
+          <h1 class="display-3 fw-bolder mb-3 text-shadow-lg" style="line-height: 1.1;">{{ movie.title }}</h1>
+          
+          <div class="d-flex flex-wrap gap-3 mb-4 align-items-center">
+            
+            <div class="d-flex align-items-center text-gold fs-5 me-2" title="Puntuación IMDb: {{ movie.rating }}/10">
+                {% set rating = movie.rating if movie.rating else 0 %}
+                {% set stars = (rating / 2) | round | int %}
+                {% for i in range(5) %}
+                    {% if i < stars %}
+                        <i class="bi bi-star-fill"></i>
+                    {% else %}
+                        <i class="bi bi-star"></i>
+                    {% endif %}
+                {% endfor %}
+                <span class="ms-2 fw-bold text-white" style="font-size: 1rem;">{{ rating }}/10</span>
+            </div>
+
+            {% if movie.runtime and movie.runtime != 'N/A' %}
+            <div class="d-flex align-items-center text-white-50 border-start border-secondary ps-3" style="height: 24px;">
+                <i class="bi bi-clock me-2 text-warning"></i>
+                <span class="fw-bold" style="font-size: 0.9rem; letter-spacing: 0.5px;">{{ movie.runtime }}</span>
+            </div>
+            {% endif %}
+             
+             <div class="d-flex flex-wrap gap-2 ms-auto">
+              {% for genre in movie.genres %}
+                <span class="badge bg-transparent border border-gold text-gold rounded-0 px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;">
+                  {{ genre.name }}
+                </span>
+              {% endfor %}
+            </div>
+          </div>
+
+          {% if current_user.is_authenticated %}
+          <div class="mb-5">
+              {% set is_seen = movie in current_user.seen_list %}
+              <button onclick="toggleSeen('{{ movie.id }}', this)" 
+                      class="btn {% if is_seen %}btn-gold{% else %}btn-outline-gold{% endif %} rounded-pill px-4 py-2 text-uppercase d-inline-flex align-items-center gap-2">
+                  {% if is_seen %}
+                      <i class="bi bi-check-circle-fill"></i> VISTA
+                  {% else %}
+                      <i class="bi bi-eye"></i> MARCAR COMO VISTA
+                  {% endif %}
+              </button>
+          </div>
+          {% endif %}
+
+          <div class="mb-4 pe-lg-5">
+            <h4 class="fw-bold text-gold text-uppercase mb-3" style="letter-spacing: 1px;">Sinopsis</h4>
+            <p class="lead fs-4 text-white" style="line-height: 1.7; opacity: 0.95; font-weight: 300;">
+              {{ movie.description or "No hay descripción disponible para esta película." }}
+            </p>
+          </div>
+
+          <div class="mb-5 pe-lg-5">
+             <h4 class="fw-bold text-gold text-uppercase mb-3" style="letter-spacing: 1px;">
+                <i class="bi bi-play-circle-fill me-2"></i>Trailer Oficial
+             </h4>
+
+             {% if movie.embed_url %}
+                 <div class="trailer-wrapper">
+                     <div class="ratio ratio-16x9">
+                         <iframe 
+                             src="{{ movie.embed_url }}" 
+                             title="YouTube video player" 
+                             frameborder="0" 
+                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                             allowfullscreen>
+                         </iframe>
+                     </div>
+                 </div>
+             {% else %}
+                 <div class="alert alert-dark border-secondary d-flex align-items-center text-white-50 p-3 rounded-4">
+                     <i class="bi bi-exclamation-triangle fs-4 me-3 text-warning"></i>
+                     <div>
+                        <span class="d-block fw-bold text-white">Trailer no disponible</span>
+                        <small>No se encontró un enlace válido para reproducir el video aquí.</small>
+                     </div>
+                     <a href="https://www.youtube.com/results?search_query=trailer+{{ movie.title }}" target="_blank" class="btn btn-outline-light btn-sm ms-auto rounded-pill">
+                        Buscar en YouTube
+                     </a>
+                 </div>
+             {% endif %}
+          </div>
+
+          {% if current_user.is_admin %}
+            <div class="pt-4 border-top border-secondary border-opacity-50" style="max-width: 600px;">
+              <p class="text-uppercase small fw-bolder text-gold mb-3" style="letter-spacing: 2px;">Administración</p>
+              <div class="d-flex gap-3">
+                <a href="{{ url_for('movies.edit_movie', movie_id=movie.id) }}" class="btn btn-dark border-secondary btn-sm px-4 py-2 rounded-pill d-flex align-items-center hover-text-gold transition-base">
+                  <i class="bi bi-pencil-fill me-2"></i> Editar
+                </a>
+                <form action="{{ url_for('movies.delete_movie', movie_id=movie.id) }}" method="post">
+                  <button type="submit" class="btn btn-danger btn-sm px-4 py-2 rounded-pill d-flex align-items-center shadow-sm transition-base" onclick="return confirm('¿Eliminar permanentemente?');">
+                    <i class="bi bi-trash-fill me-2"></i> Eliminar
+                  </button>
+                </form>
+              </div>
+            </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    // Función AJAX para marcar como vista sin recargar
+    async function toggleSeen(movieId, btn) {
+        try {
+            // Deshabilitar botón temporalmente para evitar doble click
+            btn.disabled = true;
+            
+            const response = await fetch(`/movies/toggle_seen/${movieId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                if (data.status === 'seen') {
+                    // Cambiar a estilo "Visto" (Relleno Dorado)
+                    btn.classList.remove('btn-outline-gold');
+                    btn.classList.add('btn-gold');
+                    btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> VISTA';
+                } else {
+                    // Cambiar a estilo "No visto" (Borde Dorado)
+                    btn.classList.remove('btn-gold');
+                    btn.classList.add('btn-outline-gold');
+                    btn.innerHTML = '<i class="bi bi-eye"></i> MARCAR COMO VISTA';
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Hubo un problema al conectar con el servidor.');
+        } finally {
+            btn.disabled = false;
+        }
+    }
+</script>
+
+{% endblock %}

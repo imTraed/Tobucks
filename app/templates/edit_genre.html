@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Género - Tobucks{% endblock %}
+
+{% block head %}
+<style>
+  body { background-color: #050505; }
+
+  /* --- TARJETA CENTRAL --- */
+  .admin-card {
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 50px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    max-width: 500px;
+    margin: 60px auto;
+    text-align: center;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #FFD700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+  
+  .subtitle {
+    color: rgba(255,255,255,0.4);
+    font-size: 0.85rem;
+    margin-bottom: 40px;
+  }
+
+  /* --- ICONO --- */
+  .icon-header {
+    font-size: 3rem;
+    color: #FFD700;
+    margin-bottom: 20px;
+    opacity: 0.8;
+    display: block;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.2));
+  }
+
+  /* --- INPUTS --- */
+  .form-label-gold {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    display: block;
+    text-align: left;
+  }
+
+  .form-control-premium {
+    background-color: #1a1a1a !important;
+    border: 2px solid rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important; /* TEXTO BLANCO */
+    padding: 15px 20px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    width: 100%;
+    transition: all 0.3s;
+  }
+  
+  .form-control-premium:focus {
+    background-color: #222 !important;
+    border-color: #FFD700 !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2) !important;
+    color: #FFD700 !important;
+    outline: none;
+  }
+  
+  /* Arreglo autocompletado */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active{
+      -webkit-box-shadow: 0 0 0 30px #1a1a1a inset !important;
+      -webkit-text-fill-color: white !important;
+  }
+
+  /* --- BOTONES --- */
+  .btn-update {
+    background: #FFD700;
+    color: #000;
+    font-weight: 900;
+    padding: 15px;
+    border-radius: 12px;
+    border: none;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 10px;
+    transition: all 0.2s;
+  }
+  .btn-update:hover { 
+    transform: translateY(-3px); 
+    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+    background-color: #ffe033;
+  }
+
+  .btn-cancel {
+    display: block;
+    width: 100%;
+    margin-top: 15px;
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+  }
+  .btn-cancel:hover { color: #fff; text-decoration: underline; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    
+    <div class="admin-card">
+        <i class="bi bi-pencil-square icon-header"></i>
+        
+        <h1 class="section-title">Editar Género</h1>
+        <p class="subtitle">Modificando ID: <span class="text-warning">{{ genre.id }}</span></p>
+
+        <form method="POST">
+            <div class="text-start mb-4">
+                <label for="name" class="form-label-gold">Nombre del Género</label>
+                <input type="text" class="form-control form-control-premium" id="name" name="name" 
+                       value="{{ genre.name }}" required autocomplete="off">
+            </div>
+            
+            <button type="submit" class="btn-update">
+                <i class="bi bi-check2-circle me-2"></i> Guardar Cambios
+            </button>
+
+            <a href="{{ url_for('movies.add_genre') }}" class="btn-cancel">
+                Cancelar y Volver
+            </a>
+        </form>
+
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - Tobucks{% endblock %}
+
+{% block head %}
+<style>
+    /* Hero Section estilo Cine Premium */
+    .hero-section {
+        height: 90vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Efectos de luz dinámicos */
+    .hero-glow {
+        position: absolute;
+        width: 800px;
+        height: 800px;
+        background: radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, transparent 70%);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        animation: pulse-glow 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+        50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 900px;
+        padding: 40px 20px;
+    }
+
+    .hero-title {
+        font-size: 4.5rem;
+        font-weight: 900;
+        color: #fff;
+        margin-bottom: 25px;
+        letter-spacing: -1px;
+        line-height: 1.15;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .hero-title span {
+        background: linear-gradient(135deg, #FFD700 0%, #FFC700 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: none;
+    }
+
+    .hero-subtitle {
+        font-size: 1.35rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 50px;
+        font-weight: 300;
+        line-height: 1.6;
+    }
+
+    /* Contenedor de botones ajustado */
+    .hero-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .btn-cta {
+        background: linear-gradient(135deg, #FFD700 0%, #FFC700 100%);
+        color: #000;
+        font-weight: 800;
+        padding: 16px 35px;
+        border-radius: 50px;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        border: none;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+    }
+
+    .btn-cta:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4);
+        background: linear-gradient(135deg, #FFC700 0%, #FFB700 100%);
+        color: #000;
+        text-decoration: none;
+    }
+
+    .btn-cta-secondary {
+        background: transparent;
+        color: #FFD700;
+        border: 2px solid #FFD700;
+        font-weight: 700;
+        box-shadow: none; /* Sin sombra por defecto en secundarios */
+    }
+
+    .btn-cta-secondary:hover {
+        background: rgba(255, 215, 0, 0.1);
+        color: #FFD700;
+        text-decoration: none;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-section">
+    <div class="hero-glow"></div>
+    
+    <div class="hero-content animate">
+        <h1 class="hero-title">
+            Tu Universo de <br>
+            <span>Cine Premium</span>
+        </h1>
+        <p class="hero-subtitle">
+            Explora nuestro catálogo completo de películas<br>
+            Basado en tus preferencias, descubre recomendaciones personalizadas
+        </p>
+        
+        <div class="hero-buttons">
+            <a href="{{ url_for('movies.list_movies') }}" class="btn-cta">
+                <i class="bi bi-play-circle"></i> Ver Catálogo
+            </a>
+
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('ai.adventure_mode') }}" class="btn-cta">
+                    <i class="bi bi-stars"></i> Modo Aventura
+                </a>
+
+                <a href="{{ url_for('recommendations.recommendations') }}" class="btn-cta btn-cta-secondary">
+                    <i class="bi bi-lightning-charge"></i> Mis Recomendaciones
+                </a>
+                
+                <a href="{{ url_for('users.preferences') }}" class="btn-cta btn-cta-secondary">
+                    <i class="bi bi-sliders"></i> Preferencias
+                </a>
+                
+            {% else %}
+                <a href="{{ url_for('users.register') }}" class="btn-cta btn-cta-secondary">
+                    <i class="bi bi-pencil"></i> Registrarse
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

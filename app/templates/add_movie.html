@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if current_user.is_admin %}Añadir Película{% else %}Solicitar Película{% endif %} - Tobucks
+{% endblock %}
+
+{% block head %}
+<style>
+    body { background-color: #050505; }
+    
+    .form-card {
+        background: #111;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .omdb-section {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(0,0,0,0) 100%);
+        border: 1px solid #FFD700;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 40px;
+    }
+    .omdb-label { color: #FFD700; font-weight: 800; letter-spacing: 1px; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; }
+    
+    .input-group-omdb .form-control {
+        background: #000; border: 1px solid #333; color: #fff; border-right: none;
+    }
+    .input-group-omdb .form-control:focus { border-color: #FFD700; box-shadow: none; }
+    .btn-omdb {
+        background: #FFD700; color: #000; font-weight: bold; border: 1px solid #FFD700; transition: all 0.3s;
+    }
+    .btn-omdb:hover { background: #ffe033; transform: translateX(2px); }
+
+    .form-label { color: rgba(255,255,255,0.7); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
+    .form-control-dark {
+        background-color: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px;
+    }
+    .form-control-dark:focus {
+        background-color: #222; border-color: #FFD700; outline: none; box-shadow: 0 0 10px rgba(255, 215, 0, 0.1); color: #fff;
+    }
+
+    .poster-preview-box {
+        width: 100%; aspect-ratio: 2/3; background: #000; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        border: 2px dashed rgba(255,255,255,0.2); overflow: hidden; position: relative;
+        cursor: pointer; transition: all 0.3s;
+    }
+    .poster-preview-box:hover { border-color: #FFD700; background: rgba(255,215,0,0.05); }
+    .poster-img-preview { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .poster-placeholder { text-align: center; color: rgba(255,255,255,0.3); }
+    
+    .genre-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .genre-check-input { display: none; }
+    .genre-check-label {
+        display: block; text-align: center; padding: 10px;
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 50px; color: rgba(255,255,255,0.6); font-size: 0.85rem;
+        cursor: pointer; transition: all 0.2s; user-select: none;
+    }
+    .genre-check-input:checked + .genre-check-label {
+        background: #FFD700; color: #000; border-color: #FFD700; font-weight: bold;
+    }
+
+    .btn-submit {
+        width: 100%; padding: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+        background: linear-gradient(135deg, #FFD700, #FFA500); border: none; border-radius: 8px; color: #000;
+        margin-top: 30px; transition: transform 0.2s;
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('movies.list_movies') }}" class="text-white-50 text-decoration-none me-3 hover-text-gold"><i class="bi bi-arrow-left fs-4"></i></a>
+                <h2 class="text-white fw-bold m-0">
+                    {% if current_user.is_admin %}Añadir Nueva Película{% else %}Solicitar Película{% endif %}
+                </h2>
+            </div>
+
+            <div class="omdb-section">
+                <label class="omdb-label"><i class="bi bi-magic me-2"></i>Autocompletar Datos</label>
+                <div class="input-group input-group-omdb">
+                    <input type="text" id="omdb_search" class="form-control" placeholder="Escribe el nombre exacto (Ej: The Dark Knight)...">
+                    <button class="btn btn-omdb" type="button" onclick="searchOMDB()">
+                        <i class="bi bi-search me-2"></i>Buscar
+                    </button>
+                </div>
+                <div id="omdb_loading" class="text-warning small mt-2" style="display:none;">
+                    <span class="spinner-border spinner-border-sm me-1"></span> Traduciendo y buscando datos...
+                </div>
+                <div id="omdb_error" class="text-danger small mt-2 fw-bold" style="display:none;"></div>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" class="form-card">
+                <div class="row g-5">
+                    
+                    <div class="col-md-4">
+                        <label class="form-label text-center w-100 mb-3">Portada</label>
+                        <div class="poster-preview-box" onclick="document.getElementById('poster').click()">
+                            <img id="preview_img" class="poster-img-preview">
+                            <div id="placeholder_icon" class="poster-placeholder">
+                                <i class="bi bi-cloud-upload fs-1 mb-2"></i>
+                                <div class="small fw-bold">SUBIR IMAGEN</div>
+                                <div class="text-white-50" style="font-size: 0.7rem;">JPG, PNG</div>
+                            </div>
+                        </div>
+                        <input type="file" name="poster" id="poster" class="d-none" accept="image/*" onchange="previewFile()">
+                        <input type="hidden" name="poster_url" id="poster_url_hidden"> 
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="mb-4">
+                            <label class="form-label">Título</label>
+                            <input type="text" name="title" id="title" class="form-control form-control-dark" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Sinopsis</label>
+                            <textarea name="description" id="description" class="form-control form-control-dark" rows="4"></textarea>
+                        </div>
+
+                        {% if current_user.is_admin %}
+                        <div class="mb-4">
+                            <label class="form-label">Trailer (YouTube URL)</label>
+                            <div class="input-group">
+                                <input type="text" name="trailer_url" id="trailer_url" class="form-control form-control-dark" placeholder="https://youtube.com/...">
+                                <button class="btn btn-outline-secondary" type="button" onclick="autoFindTrailer()">
+                                    <i class="bi bi-youtube text-danger"></i> Auto
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-4">
+                            <label class="form-label mb-3">Géneros</label>
+                            <div class="genre-grid">
+                                {% for genre in genres %}
+                                <div>
+                                    <input type="checkbox" name="genres" value="{{ genre.id }}" id="g_{{ genre.id }}" class="genre-check-input">
+                                    <label for="g_{{ genre.id }}" class="genre-check-label">{{ genre.name }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <i class="bi bi-check-lg me-2"></i>
+                            {% if current_user.is_admin %}Guardar Película{% else %}Enviar Solicitud{% endif %}
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function previewFile() {
+        const preview = document.getElementById('preview_img');
+        const file = document.getElementById('poster').files[0];
+        const placeholder = document.getElementById('placeholder_icon');
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // --- FUNCIÓN BÚSQUEDA OMDB ---
+    async function searchOMDB() {
+        const query = document.getElementById('omdb_search').value;
+        const loader = document.getElementById('omdb_loading');
+        const errorMsg = document.getElementById('omdb_error');
+        
+        if (!query) return;
+
+        loader.style.display = 'block';
+        errorMsg.style.display = 'none';
+
+        try {
+            const response = await fetch("{{ url_for('movies.search_omdb') }}", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ title: query })
+            });
+
+            const data = await response.json();
+            loader.style.display = 'none';
+
+            if (data.Response === "True") {
+                document.getElementById('title').value = data.Title;
+                document.getElementById('description').value = data.Plot;
+                
+                // Marcar géneros
+                if (data.Genre && data.Genre !== "N/A") {
+                    const incomingGenres = data.Genre.toLowerCase().split(',').map(s => s.trim());
+                    document.querySelectorAll('.genre-check-label').forEach(label => {
+                        const labelText = label.innerText.toLowerCase().trim();
+                        if (incomingGenres.some(inc => inc.includes(labelText) || labelText.includes(inc))) {
+                            label.previousElementSibling.checked = true;
+                        }
+                    });
+                }
+
+                // Poster
+                if (data.Poster && data.Poster !== "N/A") {
+                    const preview = document.getElementById('preview_img');
+                    const placeholder = document.getElementById('placeholder_icon');
+                    preview.src = data.Poster;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    document.getElementById('poster_url_hidden').value = data.Poster;
+                }
+
+                // Buscar trailer solo si el input existe (es admin)
+                // Usamos un pequeño timeout para que no bloquee la UI
+                setTimeout(() => autoFindTrailer(data.Title), 500);
+
+            } else {
+                errorMsg.innerText = "No se encontró. Prueba con el título en inglés.";
+                errorMsg.style.display = 'block';
+            }
+
+        } catch (error) {
+            console.error(error);
+            loader.style.display = 'none';
+            errorMsg.innerText = "Error de conexión con el servidor.";
+            errorMsg.style.display = 'block';
+        }
+    }
+
+    // --- FUNCIÓN BÚSQUEDA TRAILER (SEGURA) ---
+    async function autoFindTrailer(titleOverride = null) {
+        // VERIFICACIÓN DE SEGURIDAD:
+        // Si el usuario no es admin, este input no existe en el HTML.
+        // Si no existe, salimos de la función silenciosamente.
+        const trailerInput = document.getElementById('trailer_url');
+        if (!trailerInput) return;
+
+        const titleInput = document.getElementById('title');
+        const title = titleOverride || titleInput.value;
+
+        if (!title) return;
+
+        trailerInput.placeholder = "Buscando trailer...";
+        
+        try {
+            const response = await fetch("{{ url_for('movies.find_trailer_api') }}", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ title: title })
+            });
+            const data = await response.json();
+            if (data.success) {
+                trailerInput.value = data.url;
+            } else {
+                trailerInput.placeholder = "No encontrado. Pega el link manual.";
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+</script>
+
+
+{% if existing_movie %}
+<div class="modal fade" id="duplicateModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: #1a1a1a; border: 1px solid #FFD700; color: #fff;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold text-warning">
+                    <i class="bi bi-check-circle-fill me-2"></i>¡Ya la tenemos!
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <p class="text-white-50 mb-4">
+                    La película <strong>"{{ existing_movie.title }}"</strong> ya se encuentra disponible en nuestro catálogo oficial. ¡No necesitas solicitarla!
+                </p>
+                
+                <div class="d-flex justify-content-center mb-4">
+                    <div style="width: 120px; border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);">
+                        {% if existing_movie.poster %}
+                            <img src="{{ url_for('static', filename=existing_movie.poster) }}" style="width: 100%; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-dark text-white-50 py-5"><i class="bi bi-film fs-1"></i></div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <a href="{{ url_for('movies.view_movie', movie_id=existing_movie.id) }}" class="btn w-100 fw-bold py-2" style="background: #FFD700; color: #000;">
+                    <i class="bi bi-play-fill me-1"></i> Ver Película Ahora
+                </a>
+                
+                <button type="button" class="btn btn-link text-white-50 mt-2 text-decoration-none small" data-bs-dismiss="modal">
+                    Volver al formulario
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var myModal = new bootstrap.Modal(document.getElementById('duplicateModal'));
+        myModal.show();
+    });
+</script>
+{% endif %}
+
+{% endblock %}

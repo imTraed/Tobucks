@@ -1,0 +1,381 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar: {{ movie.title }}{% endblock %}
+
+{% block head %}
+<style>
+  /* --- ESTILOS DEL FORMULARIO DE ADMINISTRACIÓN --- */
+  
+  body {
+    background-color: #050505;
+  }
+
+  /* Contenedor de la imagen (Preview) */
+  .poster-upload-container {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+    background: #111;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .poster-preview {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+  }
+
+  /* Overlay para cambiar imagen */
+  .upload-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    text-align: center;
+    opacity: 0; 
+    transition: opacity 0.3s;
+  }
+  
+  .poster-upload-container:hover .upload-overlay {
+    opacity: 1;
+  }
+
+  /* Input file oculto */
+  #poster_file { display: none; }
+
+  /* --- INPUTS PERSONALIZADOS --- */
+  .form-label {
+    color: #FFD700; /* Dorado */
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .form-control-dark {
+    background-color: #121212;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 12px 15px;
+    border-radius: 8px;
+    transition: all 0.3s;
+  }
+
+  .form-control-dark:focus {
+    background-color: #1a1a1a;
+    border-color: #FFD700;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.1);
+    color: white;
+    outline: none;
+  }
+  
+  .form-control-dark::placeholder { color: rgba(255,255,255,0.3); }
+
+  /* --- GÉNEROS COMO CHIPS --- */
+  .genre-selector-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #0f0f0f;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .genre-check-input { display: none; }
+
+  .genre-check-label {
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50px;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .genre-check-label:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+  }
+
+  /* Estado Seleccionado */
+  .genre-check-input:checked + .genre-check-label {
+    background: #FFD700;
+    color: #000;
+    border-color: #FFD700;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  }
+
+  /* --- BOTONES DE ACCIÓN --- */
+  .btn-save {
+    background: #FFD700;
+    color: #000;
+    font-weight: bold;
+    padding: 12px 30px;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    transition: transform 0.2s;
+  }
+  .btn-save:hover { background: #ffe033; transform: scale(1.02); }
+
+  .btn-cancel {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7);
+    padding: 12px 30px;
+    border-radius: 8px;
+    width: 100%;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+  }
+  .btn-cancel:hover { border-color: white; color: white; background: rgba(255,255,255,0.05); }
+
+  /* ZONA DE PELIGRO */
+  .danger-zone {
+      margin-top: 60px;
+      border: 1px solid rgba(220, 53, 69, 0.3);
+      background: rgba(220, 53, 69, 0.05);
+      border-radius: 12px;
+      padding: 30px;
+  }
+  .btn-delete {
+      background-color: transparent;
+      border: 1px solid #dc3545;
+      color: #dc3545;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.3s;
+  }
+  .btn-delete:hover {
+      background-color: #dc3545;
+      color: white;
+  }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    
+    <div class="d-flex align-items-center mb-5 border-bottom border-secondary border-opacity-25 pb-3">
+        <h2 class="text-white fw-bold m-0"><i class="bi bi-pencil-square text-warning me-3"></i>Editar Película</h2>
+        <span class="ms-3 badge bg-secondary bg-opacity-25 text-white-50">ID: {{ movie.id }}</span>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('movies.edit_movie', movie_id=movie.id) }}">
+        
+        <div class="row g-5">
+            
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 100px;">
+                    <label class="form-label mb-3 d-block text-center">Portada Oficial</label>
+                    
+                    <div class="poster-upload-container" onclick="document.getElementById('poster_file').click();">
+                        <img id="poster_preview" 
+                             src="{% if movie.poster %}{{ url_for('static', filename=movie.poster) }}{% else %}{{ url_for('static', filename='img/default-movie.png') }}{% endif %}" 
+                             class="poster-preview" alt="Portada">
+                        
+                        <div class="upload-overlay">
+                            <i class="bi bi-camera-fill text-white fs-2 mb-2"></i>
+                            <div class="text-white small fw-bold">CAMBIAR IMAGEN</div>
+                        </div>
+                    </div>
+                    
+                    <input type="file" name="poster" id="poster_file" accept="image/*" onchange="previewImage(this)">
+                    
+                    <div class="text-center mt-3">
+                        <small class="text-white-50"><i class="bi bi-info-circle me-1"></i>Clic en la imagen para cambiarla</small>
+                    </div>
+
+                    {% if movie.poster %}
+                    <div class="text-center mt-3">
+                        <div class="form-check d-inline-block">
+                            <input class="form-check-input" type="checkbox" name="delete_poster" id="delete_poster">
+                            <label class="form-check-label text-danger small" for="delete_poster">
+                                Eliminar portada actual
+                            </label>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                
+                <div class="mb-4">
+                    <label for="title" class="form-label">Título</label>
+                    <input type="text" class="form-control form-control-dark fs-5 fw-bold" id="title" name="title" value="{{ movie.title }}" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="trailer_url" class="form-label"><i class="bi bi-youtube me-1"></i> Link del Trailer</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary border-opacity-25 text-secondary">URL</span>
+                        <input type="text" class="form-control form-control-dark" id="trailer_url" name="trailer_url" 
+                               value="{{ movie.trailer_url or '' }}" 
+                               placeholder="Pega el link o usa Auto-Buscar...">
+                        
+                        <button type="button" class="btn btn-outline-warning" onclick="autoFindTrailer()" id="btnSearchTrailer">
+                            <i class="bi bi-magic me-2"></i>Auto-Buscar
+                        </button>
+                    </div>
+                    <div class="form-text text-white-50 small" id="trailerHelp">
+                        Si no tienes el link, presiona "Auto-Buscar" para encontrarlo automáticamente en YouTube.
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label for="rating" class="form-label"><i class="bi bi-star-fill text-warning me-1"></i> Puntuación (0-10)</label>
+                        <input type="number" step="0.1" min="0" max="10" class="form-control form-control-dark" 
+                               id="rating" name="rating" value="{{ movie.rating or 0 }}" placeholder="Ej: 8.5">
+                    </div>
+                    <div class="col-md-6 mt-3 mt-md-0">
+                        <label for="runtime" class="form-label"><i class="bi bi-clock me-1"></i> Duración</label>
+                        <input type="text" class="form-control form-control-dark" 
+                               id="runtime" name="runtime" value="{{ movie.runtime or '' }}" placeholder="Ej: 1h 45min">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="form-label">Sinopsis</label>
+                    <textarea class="form-control form-control-dark" id="description" name="description" rows="5">{{ movie.description }}</textarea>
+                </div>
+
+                <div class="mb-5">
+                    <label class="form-label mb-3">Categorías</label>
+                    <div class="genre-selector-container">
+                        {% for genre in genres %}
+                        <div>
+                            <input type="checkbox" class="genre-check-input" 
+                                   id="genre_{{ genre.id }}" 
+                                   name="genres" 
+                                   value="{{ genre.id }}"
+                                   {% if genre in movie.genres %}checked{% endif %}>
+                            <label class="genre-check-label" for="genre_{{ genre.id }}">
+                                {{ genre.name }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="row pt-3 border-top border-secondary border-opacity-25">
+                    <div class="col-6">
+                        <a href="{{ url_for('movies.view_movie', movie_id=movie.id) }}" class="btn-cancel">Cancelar</a>
+                    </div>
+                    <div class="col-6">
+                        <button type="submit" class="btn-save"><i class="bi bi-save me-2"></i>Guardar</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+    <div class="danger-zone">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="text-danger fw-bold mb-1">Zona de Peligro</h5>
+                <p class="text-white-50 m-0 small">Esta acción eliminará la película permanentemente.</p>
+            </div>
+            <form action="{{ url_for('movies.delete_movie', movie_id=movie.id) }}" method="POST" onsubmit="return confirm('¿Seguro que quieres borrar {{ movie.title }}? Esta acción no se puede deshacer.');">
+                <button type="submit" class="btn btn-delete">
+                    <i class="bi bi-trash3-fill me-2"></i>Eliminar Película
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('poster_preview').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // --- FUNCIÓN DE BÚSQUEDA AUTOMÁTICA DE TRAILER ---
+    async function autoFindTrailer() {
+        const titleInput = document.getElementById('title');
+        const trailerInput = document.getElementById('trailer_url');
+        const btn = document.getElementById('btnSearchTrailer');
+        const helpText = document.getElementById('trailerHelp');
+
+        const title = titleInput.value.trim();
+
+        if (!title) {
+            alert("Por favor, asegúrate de que el campo 'Título' no esté vacío.");
+            titleInput.focus();
+            return;
+        }
+
+        // 1. Mostrar estado de carga
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Buscando...';
+        btn.disabled = true;
+        trailerInput.classList.remove('is-invalid', 'is-valid');
+
+        try {
+            // 2. Consultar a la API interna
+            const response = await fetch("{{ url_for('movies.find_trailer_api') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ title: title })
+            });
+
+            const data = await response.json();
+
+            // 3. Procesar respuesta
+            if (response.ok && data.success) {
+                trailerInput.value = data.url;
+                
+                // Feedback visual positivo
+                trailerInput.classList.add('is-valid');
+                helpText.innerHTML = '<span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i> ¡Trailer encontrado!</span>';
+                
+                // Efecto de parpadeo suave
+                trailerInput.style.backgroundColor = "rgba(255, 215, 0, 0.2)";
+                setTimeout(() => { trailerInput.style.backgroundColor = ""; }, 800);
+
+            } else {
+                trailerInput.classList.add('is-invalid');
+                helpText.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-circle me-1"></i> No se encontró. Intenta buscarlo manualmente.</span>';
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("Error de conexión al buscar el trailer.");
+        } finally {
+            // 4. Restaurar botón
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+</script>
+{% endblock %}

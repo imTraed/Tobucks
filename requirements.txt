@@ -1,0 +1,20 @@
+
+# Framework Web
+Flask==2.1.2
+Flask-SQLAlchemy==2.5.1
+Flask-Migrate==3.1.0
+Flask-Login>=0.6.1
+
+# Bases de Datos
+pymysql==1.0.2
+psycopg2-binary>=2.9.0
+
+# Servidor de Producción
+gunicorn>=20.1.0
+
+# Utilidades
+python-dotenv>=0.19.0
+Werkzeug>=2.0
+
+# Nota: D3.js y Bootstrap se cargan desde CDN en los templates HTML
+

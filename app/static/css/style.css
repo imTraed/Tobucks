@@ -1,0 +1,209 @@
+/* ===== ESTILOS PERSONALIZADOS DE TOBUCKS ===== */
+
+/* Estilos del cuerpo de la página */
+body {
+  padding-bottom: 50px;
+}
+
+/* ===== VARIABLES DE COLOR (PALETA PERSONALIZADA) ===== */
+:root {
+  --primary: #FFD700;
+  --primary-contrast: #000;
+  --primary-hover: #FFD700;
+}
+
+/* ===== ESTILOS DE BOTONES PRIMARIOS ===== */
+.btn-primary {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary-contrast) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  color: var(--primary-contrast) !important;
+}
+
+.btn-primary:active,
+.btn-primary.active,
+.show > .btn-primary.dropdown-toggle {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  color: var(--primary-contrast) !important;
+}
+
+.btn-primary.disabled,
+.btn-primary:disabled {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary-contrast) !important;
+  opacity: 0.65;
+}
+
+/* ===== ESTILOS DEL GRÁFICO DE NODOS ===== */
+#graph {
+  border: 2px solid #ddd;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0);
+}
+
+#graph svg {
+  cursor: grab;
+}
+
+#graph svg:active {
+  cursor: grabbing;
+}
+
+/* ===== ESTILOS DEL MENÚ DESPLEGABLE DE USUARIO ===== */
+.user-menu-container {
+  position: relative;
+}
+
+.user-menu-btn {
+  color: #fff !important;
+  text-decoration: none;
+  padding: 0.5rem 1rem !important;
+  border: none;
+  background: none !important;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.user-menu-btn:hover {
+  opacity: 0.7;
+  text-decoration: underline;
+}
+
+.user-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  min-width: 200px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0);
+  z-index: 1000;
+  display: none;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.user-dropdown-menu.show {
+  display: block;
+}
+
+.user-dropdown-item {
+  display: block;
+  padding: 12px 16px;
+  color: #000000;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  background: none;
+}
+
+.user-dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.user-dropdown-item.logout-item {
+  color: #dc3545;
+}
+
+.user-dropdown-item.logout-item:hover {
+  background-color: #ffe6e6;
+}
+
+.user-dropdown-divider {
+  margin: 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+
+/* ===== ESTILOS DE RECOMENDACIONES DE PELÍCULAS ===== */
+.movies-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.movie-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.movie-item img {
+  width: 100px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.movie-item div {
+  flex-grow: 1;
+}
+
+.movie-item strong {
+  font-size: 18px;
+}
+
+.movie-item p {
+  font-size: 12px;
+  color: #555;
+}
+
+/* ===== ESTILOS DE PAGINACIÓN ===== */
+.pagination-container {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.pagination {
+  display: inline-flex;
+  justify-content: center;
+  gap: 15px;
+  align-items: center;
+}
+
+.page-button {
+  padding: 8px 15px;
+  border-radius: 50%;
+  background-color: #f1f1f1;
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+}
+
+.page-button.active {
+  background-color: #FFD700;
+  color: white;
+}
+
+.page-button:hover {
+  background-color: #ddd;
+}
+
+.page-button:active {
+  background-color: #bbb;
+}
+
+.page-button:focus {
+  outline: none;
+}
