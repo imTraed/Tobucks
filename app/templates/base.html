@@ -2,262 +2,441 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f0f0f'/><text x='50' y='75' font-family='sans-serif' font-size='80' font-weight='900' text-anchor='middle' fill='%23FFD700'>T</text></svg>">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}Tobucks{% endblock %}</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
 
     <style>
-        /* --- ESTILOS GLOBALES PREMIUM --- */
+        :root {
+            --tobucks-gold: #FFD700;
+            --tobucks-black: #000000;
+            --tobucks-gray: #1a1a1a;
+        }
+
         body {
-            background-color: #0f0f0f; /* Negro Profundo */
-            color: #e0e0e0;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            background-color: var(--tobucks-black);
+            font-family: 'Montserrat', sans-serif;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px; 
             overflow-x: hidden;
         }
 
-        /* --- NAVBAR MEJORADA ESTILO STREAMING --- */
-        .navbar {
-            background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
-            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
-            padding: 12px 0;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
+        /* --- NAVBAR SUPERIOR --- */
+        .navbar-custom {
+            position: sticky; 
+            top: 0;
+            z-index: 1030;
+            width: 100%;
+            background: var(--tobucks-black); 
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 10px 20px; /* Ajustado para el subtítulo */
+            transition: padding 0.3s;
+        }
+
+        /* MARCA Y SUBTÍTULO */
+        .navbar-brand-container {
+            display: flex;
+            flex-direction: column;
+            line-height: 1; /* Pega el texto de arriba con el de abajo */
         }
 
         .navbar-brand {
-            color: #FFD700 !important;
             font-weight: 900;
-            font-size: 1.7rem;
+            font-size: 1.5rem;
+            color: var(--tobucks-gold) !important;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .brand-subtitle {
+            font-size: 0.5rem; /* Letras muy pequeñas */
+            color: rgba(255,255,255,0.4);
             letter-spacing: 2px;
-            text-transform: uppercase;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-            transition: all 0.3s;
-        }
-
-        .navbar-brand:hover {
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-        }
-
-        .nav-link {
-            color: rgba(255, 255, 255, 0.75) !important;
             font-weight: 600;
-            margin: 0 15px;
-            transition: all 0.3s;
-            font-size: 0.85rem;
+            margin-left: 2px;
+            text-decoration: none;
+        }
+
+        /* --- MENÚ ESCRITORIO --- */
+        .navbar-center-menu { display: flex; gap: 20px; }
+
+        .nav-link-desktop {
+            color: rgba(255,255,255,0.7) !important;
+            font-weight: 600;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            text-decoration: none;
+            transition: 0.3s;
             position: relative;
         }
-
-        /* Efecto Hover en Enlaces */
-        .nav-link:hover {
-            color: #FFD700 !important;
-        }
         
-        .nav-link::after {
+        .nav-link-desktop:hover, .nav-link-desktop.active {
+            color: var(--tobucks-gold) !important;
+        }
+
+        .nav-link-desktop.active::after {
             content: '';
-            position: absolute;
-            width: 0;
-            height: 3px;
-            bottom: -5px;
-            left: 50%;
-            background: linear-gradient(90deg, #FFD700, #FFC700);
-            transition: all 0.3s;
-            transform: translateX(-50%);
-            border-radius: 2px;
-        }
-        
-        .nav-link:hover::after,
-        .nav-link.active::after {
-            width: 100%;
+            position: absolute; bottom: -5px; left: 0; width: 100%; height: 2px;
+            background: var(--tobucks-gold);
         }
 
-        /* Botones de Admin */
-        .admin-btn {
-            border: 1.5px solid #FFD700;
-            border-radius: 6px;
-            padding: 6px 12px !important;
-            margin: 0 8px;
-            color: #FFD700 !important;
-            background: transparent;
-            transition: all 0.3s;
-        }
-        
-        .admin-btn:hover {
-            background: rgba(255, 215, 0, 0.15);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-            transform: translateY(-2px);
-        }
-        
-        .admin-btn::after { display: none; }
-
-        /* --- DROPDOWN USUARIO --- */
-        .dropdown-menu {
-            background-color: #1a1a1a;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
-            padding: 8px 0;
+        /* --- DROPDOWN USUARIO (ESCRITORIO) --- */
+        .dropdown-menu-black {
+            background-color: #000000 !important;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            padding: 10px;
+            min-width: 180px;
             margin-top: 10px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
         }
 
-        .dropdown-item {
-            color: rgba(255, 255, 255, 0.85);
-            padding: 12px 20px;
-            font-weight: 500;
+        .dropdown-header-custom {
+            color: var(--tobucks-gold);
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            text-align: center;
+            letter-spacing: 1px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 5px;
+        }
+
+        .dropdown-item-custom {
+            color: #fff !important;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
             transition: all 0.2s;
-            border-radius: 0;
         }
 
-        .dropdown-item:hover {
-            background-color: rgba(255, 215, 0, 0.15);
-            color: #FFD700;
-            transform: translateX(5px);
+        .dropdown-item-custom:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--tobucks-gold) !important;
         }
 
-        .dropdown-item.text-danger:hover {
-            background-color: rgba(220, 53, 69, 0.2);
-            color: #ff6b6b !important;
+        .dropdown-item-custom.logout { color: #ff4d4d !important; }
+        .dropdown-item-custom.logout:hover { background-color: rgba(255, 77, 77, 0.1); }
+
+        /* --- BARRA INFERIOR MÓVIL --- */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed; bottom: 20px; left: 20px; right: 20px;
+            height: 65px; background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+            z-index: 1050; justify-content: space-around; align-items: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
 
-        /* --- CONTENIDO --- */
-        .main-content {
-            flex: 1;
+        .nav-item-mobile {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.65rem; width: 50px;
+            background: none; border: none; padding: 0; cursor: pointer;
+        }
+        .nav-item-mobile i { font-size: 1.3rem; margin-bottom: 2px; }
+        .nav-item-mobile.active { color: var(--tobucks-gold); }
+
+        .nav-item-mobile.highlight {
+            background: var(--tobucks-gold);
+            color: #000;
+            width: 55px; height: 55px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transform: translateY(-25px); 
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5); 
+            border: 4px solid #000; 
+            position: relative; overflow: visible; 
+        }
+        .nav-item-mobile.highlight i { font-size: 1.5rem; margin: 0; }
+
+        /* --- DASHBOARD CONFIG (OFFCANVAS) --- */
+        .offcanvas-bottom-custom {
+            background-color: rgba(15, 15, 15, 0.9) !important;
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.15);
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            height: auto !important;
+            max-height: 85vh; 
+            color: white;
+            z-index: 2000 !important;
+            transition: transform 0.3s ease-in-out; /* Suavidad al cerrar */
+        }
+        
+        .offcanvas-body {
+            padding: 10px 25px 40px 25px; 
+            overflow-y: auto; 
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch; 
         }
 
-        /* --- ANIMACIONES --- */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .config-btn {
+            display: flex; align-items: center; justify-content: space-between;
+            width: 100%; padding: 12px 0;
+            background: transparent;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-radius: 0; color: white; text-decoration: none;
+            margin-bottom: 5px; transition: 0.2s;
+        }
+        .config-btn:not(.disabled):hover {
+            background: rgba(255, 215, 0, 0.05);
+            color: var(--tobucks-gold);
+            padding-left: 10px; 
+        }
+        .config-btn.disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
+        .config-icon { font-size: 1.2rem; margin-right: 15px; } 
+        .config-title { font-size: 0.95rem; font-weight: 700; }
+        .config-desc { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
+
+        .offcanvas-header { 
+            border-bottom: none; padding-bottom: 5px; padding-top: 15px;
+            cursor: grab; /* Indica que se puede arrastrar */
+        }
+        .offcanvas-header:active { cursor: grabbing; }
+
+        .drag-handle {
+            width: 60px; height: 5px; background: rgba(255,255,255,0.4);
+            border-radius: 10px; margin: 0 auto 15px auto;
         }
 
-        .animate {
-            animation: slideIn 0.5s ease-out;
+        /* RESPONSIVIDAD */
+        @media (max-width: 991px) {
+            .navbar-center-menu { display: none !important; }
+            .mobile-bottom-nav { display: flex; }
+            .navbar-custom { padding: 12px 15px; }
+        }
+
+        @media (min-width: 992px) {
+            .mobile-bottom-nav { display: none; }
+            body { padding-bottom: 0; }
+            .navbar-custom { padding: 20px 40px; }
+        }
+
+        .admin-badge {
+            border: 1px solid var(--tobucks-gold); color: var(--tobucks-gold);
+            padding: 6px 12px; border-radius: 6px; font-size: 0.8rem;
+            text-decoration: none; margin-right: 10px; transition: 0.2s;
+        }
+        .admin-badge:hover { background: var(--tobucks-gold); color: #000; }
+
+        .flash-messages-container {
+            position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
+            z-index: 2000; width: 90%; max-width: 400px;
+        }
+        .alert-custom {
+            background: #222; color: #fff; border-left: 4px solid var(--tobucks-gold);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5); border-radius: 8px;
         }
     </style>
     {% block head %}{% endblock %}
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-        <div class="container-fluid px-5">
+    <nav class="navbar navbar-expand-lg navbar-custom" id="mainNav">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
             
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">TOBUCKS.</a>
-            
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto align-items-center">
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('movies.list_movies') }}">Películas</a>
-                    </li>
+            <a class="navbar-brand-container text-decoration-none" href="{{ url_for('main.index') }}">
+                <span class="navbar-brand">TOBUCKS.</span>
+                <span class="brand-subtitle">made by iTraed</span>
+            </a>
 
-                    {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('recommendations.recommendations') }}">Recomendaciones</a>
-                    </li>
+            <div class="navbar-center-menu d-none d-lg-flex">
+                <a class="nav-link-desktop {{ 'active' if request.endpoint == 'main.index' }}" href="{{ url_for('main.index') }}">Inicio</a>
+                <a class="nav-link-desktop {{ 'active' if request.endpoint == 'movies.list_movies' }}" href="{{ url_for('movies.list_movies') }}">Películas</a>
+                {% if current_user.is_authenticated %}
+                <a class="nav-link-desktop {{ 'active' if request.endpoint == 'ai.concierge' }}" href="{{ url_for('ai.concierge') }}">IA</a>    
+                <a class="nav-link-desktop {{ 'active' if request.endpoint == 'recommendations.recommendations' }}" href="{{ url_for('recommendations.recommendations') }}">Para Ti</a>
+                <a class="nav-link-desktop {{ 'active' if request.endpoint == 'users.preferences' }}" href="{{ url_for('users.preferences') }}">Gustos</a>
+                {% endif %}
+            </div>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('ai.concierge') }}">Encuesta IA</a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('users.preferences') }}">Preferencias</a>
-                    </li>
-                    {% endif %}
-                    
-                    {% if current_user.is_authenticated and current_user.is_admin %}
-                        <li class="nav-item border-start border-secondary mx-3 ps-3" style="height: 20px; opacity: 0.3;"></li> <li class="nav-item">
-                            <a class="nav-link admin-btn" href="{{ url_for('movies.add_movie') }}" title="Agregar Película">
-                                <i class="bi bi-plus-lg"></i> Película
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link admin-btn" href="{{ url_for('movies.add_genre') }}" title="Gestionar Géneros">
-                                <i class="bi bi-tags"></i> Géneros
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link admin-btn" href="{{ url_for('movies.list_movies') }}#pending_section" title="Ver Solicitudes">
-                                <i class="bi bi-bell-fill"></i>
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
+            <div class="d-flex align-items-center">
+                {% if current_user.is_authenticated and current_user.is_admin %}
+                    <div class="d-none d-lg-block me-3">
+                        <a href="{{ url_for('movies.add_movie') }}" class="admin-badge"><i class="bi bi-plus-lg"></i></a>
+                    </div>
+                {% endif %}
 
-                <ul class="navbar-nav ms-auto align-items-center">
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2 text-white fw-bold" style="width: 35px; height: 35px; font-size: 0.9rem;">
-                                    {{ current_user.username[0]|upper }}
-                                </div>
-                                <span class="fw-bold text-white">{{ current_user.username }}</span>
-                            </a>
-                            
-                            <ul class="dropdown-menu dropdown-menu-end animate slideIn">
-                                <li>
-                                    <a class="dropdown-item text-danger" href="{{ url_for('users.logout') }}">
-                                        <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('users.login') }}">Entrar</a></li>
-                        <li class="nav-item">
-                            <a class="btn fw-bold px-4 ms-2" style="background-color: #FFD700; color: #000; border-radius: 50px;" href="{{ url_for('users.register') }}">
-                                Registrarse
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
+                {% if current_user.is_authenticated %}
+                    <div class="dropdown d-none d-lg-block"> 
+                        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-white" data-bs-toggle="dropdown">
+                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
+                                 style="width: 35px; height: 35px; font-size: 0.9rem; border: 1px solid #444;">
+                                {{ current_user.username[0]|upper }}
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-black mt-3 fade-down">
+                            <li><div class="dropdown-header-custom">{{ current_user.username }}</div></li>
+                            <li><a class="dropdown-item dropdown-item-custom logout" href="{{ url_for('users.logout') }}">Cerrar Sesión</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('users.login') }}" class="btn btn-sm btn-outline-light rounded-pill px-3 fw-bold" style="font-size: 0.8rem;">Entrar</a>
+                {% endif %}
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="flash-messages-container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    {% set alert_class = 'info' %}
-                    {% if category == 'error' %}{% set alert_class = 'danger' %}
-                    {% elif category == 'success' %}{% set alert_class = 'success' %}
-                    {% elif category == 'warning' %}{% set alert_class = 'warning' %}
-                    {% endif %}
-                    
-                    <div class="alert alert-{{ alert_class }} alert-dismissible fade show bg-opacity-10 border-{{ alert_class }} text-{{ alert_class }}" role="alert">
-                        <i class="bi bi-info-circle me-2"></i> {{ message }}
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <div class="alert alert-custom alert-dismissible fade show p-3 mb-2" role="alert">
+                        <i class="bi bi-info-circle me-2 text-warning"></i> {{ message }}
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
     </div>
 
-    <div class="main-content">
-        {% block content %}{% endblock %}
+    {% block content %}{% endblock %}
+
+    <div class="mobile-bottom-nav">
+        <a href="{{ url_for('main.index') }}" class="nav-item-mobile {{ 'active' if request.endpoint == 'main.index' }}">
+            <i class="bi bi-house-door-fill"></i>
+            <span>Inicio</span>
+        </a>
+        <a href="{{ url_for('movies.list_movies') }}" class="nav-item-mobile {{ 'active' if request.endpoint == 'movies.list_movies' }}">
+            <i class="bi bi-play-circle-fill"></i>
+            <span>Cine</span>
+        </a>
+        <a href="{{ url_for('ai.concierge') }}" class="nav-item-mobile highlight">
+            <i class="bi bi-robot"></i>
+        </a>
+        <a href="{{ url_for('recommendations.recommendations') }}" class="nav-item-mobile {{ 'active' if request.endpoint == 'recommendations.recommendations' }}">
+            <i class="bi bi-lightning-charge-fill"></i>
+            <span>Para Ti</span>
+        </a>
+        <button class="nav-item-mobile" type="button" data-bs-toggle="offcanvas" data-bs-target="#configDashboard" aria-controls="configDashboard">
+            <i class="bi bi-gear-fill"></i>
+            <span>Config</span>
+        </button>
+    </div>
+
+    <div class="offcanvas offcanvas-bottom offcanvas-bottom-custom" tabindex="-1" id="configDashboard" aria-labelledby="configDashboardLabel">
+        
+        <div class="offcanvas-header pb-0 justify-content-center flex-column">
+            <div class="drag-handle"></div>
+        </div>
+
+        <div class="offcanvas-body small">
+            
+            <div class="d-flex align-items-center mb-4 px-2">
+                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold me-3 shadow-lg" 
+                     style="width: 50px; height: 50px; font-size: 1.2rem; border: 2px solid var(--tobucks-black);">
+                    {% if current_user.is_authenticated %}
+                        {{ current_user.username[0]|upper }}
+                    {% else %}
+                        ?
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <div class="fw-bold text-white fs-5">
+                        {% if current_user.is_authenticated %}
+                            {{ current_user.username }}
+                        {% else %}
+                            Invitado
+                        {% endif %}
+                    </div>
+                    <div class="fw-bold" style="color: var(--tobucks-gold); font-size: 0.8rem; letter-spacing: 0.5px;">
+                        <i class="bi bi-circle-fill" style="font-size: 0.5rem; vertical-align: middle; margin-right: 4px;"></i> 
+                        CUENTA ACTIVA
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="text-white-50 text-uppercase fw-bold ms-1 mb-3" style="font-size: 0.7rem; letter-spacing: 1px;">General</h6>
+
+            <a href="{{ url_for('users.preferences') }}" class="config-btn">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-sliders config-icon text-warning"></i>
+                    <div>
+                        <div class="config-title">Mis Gustos</div>
+                        <div class="config-desc">Tus preferencias de cine</div>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right text-white-50" style="font-size: 0.9rem;"></i>
+            </a>
+
+            <div class="config-btn disabled">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-person-circle config-icon"></i>
+                    <div>
+                        <div class="config-title">Mi Perfil <span class="badge bg-dark border border-secondary text-secondary ms-1" style="font-size: 0.5rem;">PRONTO</span></div>
+                        <div class="config-desc">Editar datos personales</div>
+                    </div>
+                </div>
+                <i class="bi bi-lock-fill text-white-50" style="font-size: 0.9rem;"></i>
+            </div>
+
+            <div class="config-btn disabled">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-bookmark-heart-fill config-icon"></i>
+                    <div>
+                        <div class="config-title">Guardados <span class="badge bg-dark border border-secondary text-secondary ms-1" style="font-size: 0.5rem;">PRONTO</span></div>
+                        <div class="config-desc">Tu lista de favoritos</div>
+                    </div>
+                </div>
+                <i class="bi bi-lock-fill text-white-50" style="font-size: 0.9rem;"></i>
+            </div>
+
+            {% if current_user.is_authenticated %}
+            <div class="mt-4 pt-2">
+                <a href="{{ url_for('users.logout') }}" class="btn btn-outline-danger w-100 rounded-pill fw-bold py-3">
+                    Cerrar Sesión
+                </a>
+            </div>
+            {% endif %}
+
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dashboard = document.getElementById('configDashboard');
+            let startY = 0;
+            
+            // Detectar el inicio del toque
+            dashboard.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+            }, {passive: true});
+
+            // Detectar el final del toque
+            dashboard.addEventListener('touchend', (e) => {
+                const endY = e.changedTouches[0].clientY;
+                const diff = endY - startY;
+                const body = dashboard.querySelector('.offcanvas-body');
+
+                // Si desliza hacia abajo (más de 50px) y estamos al inicio del scroll
+                if (diff > 50 && body.scrollTop === 0) {
+                    const instance = bootstrap.Offcanvas.getInstance(dashboard);
+                    if (instance) instance.hide();
+                }
+            });
+
+            // Auto-cerrar alertas
+            setTimeout(() => {
+                document.querySelectorAll('.alert').forEach(al => {
+                    new bootstrap.Alert(al).close();
+                });
+            }, 3500);
+        });
+    </script>
 </body>
 </html>

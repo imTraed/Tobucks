@@ -4,8 +4,8 @@
 
 {% block head %}
 <style>
-  /* --- ESTILOS BASE --- */
-  body { background-color: #0f0f0f; }
+  /* --- ESTILOS BASE (DESKTOP) --- */
+  body { background-color: #000000; overflow-x: hidden; }
   .movies-wrapper { max-width: 1700px; margin: 0 auto; padding: 0 15px 100px; }
 
   /* HEADER */
@@ -45,13 +45,20 @@
   .modal-content-dark { background-color: #141414; border: 1px solid rgba(255, 215, 0, 0.2); color: #fff; }
   .form-control-modal { background: #000; border: 1px solid #333; color: white; }
   
-  /* --- CATEGORIAS Y CARRUSEL --- */
+  /* --- CATEGORIAS Y CARRUSEL (DESKTOP) --- */
   .category-title-row { color: #fff; font-size: 1.5rem; font-weight: 800; padding-left: 60px; margin-top: 50px; display: flex; align-items: center; gap: 10px; }
   .category-decorator { width: 4px; height: 25px; background-color: #FFD700; display: inline-block; }
   
   .carousel-container { max-width: 1700px; margin: 0 auto; padding: 0 60px; position: relative; }
   .carousel-wrapper { overflow: hidden; border-radius: 8px; position: relative; }
-  .movies-carousel { display: flex; gap: 20px; padding: 20px 0; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; }
+  
+  .movies-carousel { 
+      display: flex; gap: 20px; padding: 20px 0; 
+      overflow-x: auto; 
+      scroll-behavior: smooth; 
+      scrollbar-width: none; 
+      -webkit-overflow-scrolling: touch; 
+  }
   .movies-carousel::-webkit-scrollbar { display: none; }
   
   .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,215,0,0.9); width: 45px; height: 45px; border-radius: 50%; z-index: 15; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
@@ -60,7 +67,6 @@
 
   /* --- TARJETAS DE PELÍCULAS --- */
   .movie-card { 
-      /* Por defecto ancho fijo para carrusel */
       width: 180px; 
       flex-shrink: 0; cursor: pointer; transition: transform 0.3s; position: relative; border-radius: 12px; overflow: hidden; 
   }
@@ -68,7 +74,6 @@
   .poster-container { aspect-ratio: 2/3; overflow: hidden; position: relative; background-color: #111; }
   .poster-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
   
-  /* Overlay mejorado para legibilidad */
   .movie-overlay { 
       position: absolute; bottom: 0; left: 0; width: 100%; 
       padding: 30px 10px 15px; 
@@ -76,29 +81,23 @@
   }
   .movie-title { font-size: 0.95rem; font-weight: bold; color: white; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,1); }
   
-  /* --- ARREGLO DE LA CUADRÍCULA DE BÚSQUEDA --- */
+  /* GRID DE BÚSQUEDA */
   .movies-grid { 
       display: grid; 
-      /* Aumentamos el tamaño mínimo a 200px para que se vean bien */
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
       gap: 40px; 
       padding: 0 40px; 
       max-width: 1600px; 
       margin: 0 auto; 
   }
+  .movies-grid .movie-card { width: 100%; }
   
-  /* Cuando la tarjeta está dentro de una grid, ocupa todo el ancho de la celda */
-  .movies-grid .movie-card {
-      width: 100%; 
-  }
-  
-  /* FABs */
+  /* FABs & GUEST CTA (Posición Desktop) */
   .fab-container { position: fixed; bottom: 40px; right: 40px; z-index: 999; }
   .fab-add-movie, .fab-request-movie { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; text-decoration: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
   .fab-add-movie { background: #FFD700; color: #000; }
   .fab-request-movie { background: #00B4D8; color: #fff; }
 
-  /* CTA GUEST */
   .guest-floating-cta { position: fixed; bottom: 30px; right: 30px; max-width: 400px; background: rgba(15,15,15,0.95); border: 1px solid rgba(255,215,0,0.3); padding: 20px; border-radius: 12px; z-index: 1000; }
   .guest-cta-header { display: flex; align-items: center; gap: 15px; }
   .guest-cta-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #FFD700, #FFA500); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #000; }
@@ -106,6 +105,79 @@
   .guest-cta-text p { color: rgba(255,255,255,0.7); font-size: 0.85rem; margin: 3px 0 0; }
   .btn-cta-glow { background: #FFD700; color: #000; padding: 10px; border-radius: 8px; display: block; text-align: center; text-decoration: none; font-weight: bold; margin-top: 10px; }
   .cta-close { position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: rgba(255,255,255,0.3); cursor: pointer; }
+
+
+  /* ==========================================================================
+     OPTIMIZACIÓN MÓVIL (CORREGIDA EDGE-TO-EDGE)
+     ========================================================================== */
+  @media (max-width: 768px) {
+      /* 1. Quitamos los márgenes globales para que el scroll llegue al borde */
+      .movies-wrapper { 
+          padding-left: 0; 
+          padding-right: 0; 
+      }
+
+      /* Header más compacto */
+      .movies-header { padding: 40px 15px 20px; }
+      .movies-title { font-size: 2.2rem; }
+      .movies-subtitle { font-size: 0.95rem; }
+
+      /* Buscador */
+      .search-container { width: 92%; margin: 10px auto 30px; }
+      .search-input { padding: 12px 20px 12px 50px; font-size: 1rem; }
+
+      /* 2. Títulos con padding para que no se peguen, pero alineados izquierda */
+      .category-title-row { 
+          padding-left: 15px; 
+          margin-top: 25px; 
+          font-size: 1.1rem; 
+      }
+      .category-decorator { height: 18px; width: 3px; }
+
+      /* 3. Carrusel FLUIDO (Edge-to-Edge) */
+      .carousel-container { 
+          padding: 0; /* Sin padding contenedor para permitir desborde */
+          margin: 0;
+          width: 100%;
+      }
+      
+      .movies-carousel {
+          /* Padding INTERNO para que el primer elemento no se pegue al borde, 
+             pero al scrollear desaparezca por el borde real */
+          padding: 10px 15px; 
+          gap: 10px; 
+          scroll-snap-type: x mandatory; 
+      }
+
+      .carousel-btn { display: none !important; }
+
+      /* Tarjeta Móvil */
+      .movie-card {
+          width: 125px; /* Tamaño ajustado */
+          scroll-snap-align: start; 
+      }
+      .movie-title { font-size: 0.8rem; padding-bottom: 5px; }
+      .movie-overlay { padding: 20px 5px 10px; }
+
+      /* Grid búsqueda móvil */
+      .movies-grid {
+          grid-template-columns: repeat(2, 1fr); 
+          gap: 15px;
+          padding: 0 15px;
+      }
+
+      /* Admin Table */
+      .pending-section { border-radius: 0; border-left: none; border-right: none; margin: 20px 0; }
+      
+      /* 4. BOTÓN FLOTANTE (+) MÁS ABAJO */
+      .fab-container { 
+          bottom: 105px; /* Casi al ras del suelo */
+          right: 15px; 
+      } 
+      .fab-add-movie, .fab-request-movie { width: 50px; height: 50px; font-size: 1.4rem; }
+      
+      .guest-floating-cta { left: 10px; right: 10px; bottom: 20px; width: auto; max-width: none; }
+  }
 </style>
 {% endblock %}
 
@@ -298,8 +370,14 @@
             const l = c.querySelector('.left'), r = c.querySelector('.right');
             if(!row) return;
             const upd = () => {
-                l.classList.toggle('visible', row.scrollLeft > 0);
-                r.classList.toggle('visible', Math.ceil(row.scrollLeft + row.clientWidth) < row.scrollWidth);
+                // Solo mostrar flechas si el ancho es mayor a 768px (Desktop/Tablet)
+                if(window.innerWidth > 768) {
+                    l.classList.toggle('visible', row.scrollLeft > 0);
+                    r.classList.toggle('visible', Math.ceil(row.scrollLeft + row.clientWidth) < row.scrollWidth);
+                } else {
+                    l.classList.remove('visible');
+                    r.classList.remove('visible');
+                }
             };
             l.onclick = () => row.scrollBy({left:-220, behavior:'smooth'});
             r.onclick = () => row.scrollBy({left:220, behavior:'smooth'});
@@ -311,4 +389,4 @@
         });
     });
 </script>
-{% endblock %} 
+{% endblock %}

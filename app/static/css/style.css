@@ -1,209 +1,288 @@
-/* ===== ESTILOS PERSONALIZADOS DE TOBUCKS ===== */
-
-/* Estilos del cuerpo de la página */
-body {
-  padding-bottom: 50px;
-}
-
-/* ===== VARIABLES DE COLOR (PALETA PERSONALIZADA) ===== */
+/* =========================================
+   1. VARIABLES Y CONFIGURACIÓN BASE
+   ========================================= */
 :root {
-  --primary: #FFD700;
-  --primary-contrast: #000;
-  --primary-hover: #FFD700;
+    --primary: #FFD700;
+    --primary-hover: #ffcc00;
+    --bg-black: #000000;
+    --bg-dark: #121212;
+    --bg-card: #1c1c1e;
+    --text-white: #ffffff;
+    --text-gray: #8e8e93;
+    --nav-height: 80px;
+    --bottom-nav-height: 80px;
 }
 
-/* ===== ESTILOS DE BOTONES PRIMARIOS ===== */
-.btn-primary {
-  background-color: var(--primary) !important;
-  border-color: var(--primary) !important;
-  color: var(--primary-contrast) !important;
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-black);
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text-white);
+    -webkit-font-smoothing: antialiased;
 }
 
-.btn-primary:hover,
-.btn-primary:focus {
-  background-color: var(--primary-hover) !important;
-  border-color: var(--primary-hover) !important;
-  color: var(--primary-contrast) !important;
+body {
+    /* Padding inferior OBLIGATORIO para que la barra móvil no tape contenido */
+    padding-bottom: 100px;
+    /* Padding superior para que el Navbar fijo no tape contenido en Desktop */
+    padding-top: var(--nav-height); 
+    overflow-x: hidden; 
 }
 
-.btn-primary:active,
-.btn-primary.active,
-.show > .btn-primary.dropdown-toggle {
-  background-color: var(--primary-hover) !important;
-  border-color: var(--primary-hover) !important;
-  color: var(--primary-contrast) !important;
+/* Enlaces sin decoración por defecto */
+a { text-decoration: none; color: inherit; transition: 0.3s; }
+ul { list-style: none; padding: 0; margin: 0; }
+
+/* =========================================
+   2. NAVBAR SUPERIOR (DESKTOP & GENERAL)
+   ========================================= */
+.navbar-custom {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%);
+    padding: 15px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1030;
+    transition: background 0.3s ease;
 }
 
-.btn-primary.disabled,
-.btn-primary:disabled {
-  background-color: var(--primary) !important;
-  border-color: var(--primary) !important;
-  color: var(--primary-contrast) !important;
-  opacity: 0.65;
+.navbar-custom.scrolled {
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-/* ===== ESTILOS DEL GRÁFICO DE NODOS ===== */
-#graph {
-  border: 2px solid #ddd;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0);
+.navbar-brand {
+    font-weight: 900;
+    font-size: 1.5rem;
+    color: var(--primary) !important;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-#graph svg {
-  cursor: grab;
+/* =========================================
+   3. BOTTOM NAVIGATION (MÓVIL - APP STYLE)
+   ========================================= */
+.mobile-bottom-nav {
+    display: none; /* Oculto en PC */
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    height: 70px;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    z-index: 1040;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-#graph svg:active {
-  cursor: grabbing;
+.nav-item-mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.7rem;
+    width: 50px;
 }
 
-/* ===== ESTILOS DEL MENÚ DESPLEGABLE DE USUARIO ===== */
-.user-menu-container {
-  position: relative;
+.nav-item-mobile i {
+    font-size: 1.4rem;
+    margin-bottom: 3px;
+    transition: transform 0.2s;
 }
 
-.user-menu-btn {
-  color: #fff !important;
-  text-decoration: none;
-  padding: 0.5rem 1rem !important;
-  border: none;
-  background: none !important;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
+.nav-item-mobile.active { color: var(--primary); }
+.nav-item-mobile.active i { transform: translateY(-2px); }
+
+/* Botón central destacado (IA) */
+.nav-item-mobile.highlight {
+    background: var(--primary);
+    color: #000;
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transform: translateY(-25px);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+    border: 4px solid #000;
 }
 
-.user-menu-btn:hover {
-  opacity: 0.7;
-  text-decoration: underline;
+/* =========================================
+   4. HERO SECTION (PORTADA)
+   ========================================= */
+.hero-section {
+    height: 100dvh; /* Pantalla completa exacta */
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+    position: relative;
+    /* Ajuste para anular el padding-top del body en esta sección específica si se desea */
+    margin-top: calc(var(--nav-height) * -1); 
+    padding-top: var(--nav-height);
 }
 
-.user-dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  min-width: 200px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0);
-  z-index: 1000;
-  display: none;
-  margin-top: 8px;
-  overflow: hidden;
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+.hero-title span { color: var(--primary); }
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 40px;
 }
 
-.user-dropdown-menu.show {
-  display: block;
+/* =========================================
+   5. BOTONES Y UTILIDADES
+   ========================================= */
+.btn-primary, .btn-cta {
+    background: linear-gradient(135deg, var(--primary) 0%, #FFC700 100%) !important;
+    color: #000 !important;
+    font-weight: 800;
+    border: none !important;
+    padding: 12px 25px;
+    border-radius: 50px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.user-dropdown-item {
-  display: block;
-  padding: 12px 16px;
-  color: #000000;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  background: none;
+.btn-primary:hover, .btn-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
 }
 
-.user-dropdown-item:hover {
-  background-color: #f5f5f5;
+.btn-outline-warning {
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    border-radius: 50px;
+    font-weight: 700;
+}
+.btn-outline-warning:hover {
+    background: var(--primary);
+    color: #000;
 }
 
-.user-dropdown-item.logout-item {
-  color: #dc3545;
+/* =========================================
+   6. TARJETAS DE PELÍCULAS (GRID)
+   ========================================= */
+.movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    padding: 20px;
 }
 
-.user-dropdown-item.logout-item:hover {
-  background-color: #ffe6e6;
+.movie-card {
+    position: relative;
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s;
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
-.user-dropdown-divider {
-  margin: 0;
-  border: none;
-  border-top: 1px solid #eee;
+.movie-card:hover {
+    transform: scale(1.03);
+    border-color: var(--primary);
+    z-index: 10;
 }
 
-/* ===== ESTILOS DE RECOMENDACIONES DE PELÍCULAS ===== */
-.movies-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.movie-poster-container {
+    aspect-ratio: 2/3;
+    width: 100%;
+    position: relative;
 }
 
-.movie-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+.movie-poster-container img {
+    width: 100%; height: 100%; object-fit: cover;
 }
 
-.movie-item img {
-  width: 100px;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 4px;
+/* =========================================
+   7. PREFERENCIAS (GÉNEROS)
+   ========================================= */
+.genres-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    padding: 20px;
 }
 
-.movie-item div {
-  flex-grow: 1;
+.genre-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 25px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; flex-direction: column; align-items: center;
 }
 
-.movie-item strong {
-  font-size: 18px;
+.genre-checkbox:checked + .genre-card {
+    background: rgba(255, 215, 0, 0.15);
+    border-color: var(--primary);
+}
+.genre-checkbox:checked + .genre-card .genre-icon { color: var(--primary); transform: scale(1.1); }
+.genre-checkbox:checked + .genre-card .genre-name { color: #fff; font-weight: 700; }
+
+/* Botón flotante de guardar */
+.save-bar-container {
+    position: fixed; bottom: 30px; left: 0; right: 0;
+    z-index: 1050; display: flex; justify-content: center;
+    pointer-events: none;
+}
+.btn-save-float {
+    pointer-events: auto; width: 90%; max-width: 500px;
 }
 
-.movie-item p {
-  font-size: 12px;
-  color: #555;
-}
+/* =========================================
+   8. RESPONSIVE (MÓVIL)
+   ========================================= */
+@media (max-width: 991px) {
+    /* Activar barra inferior */
+    .mobile-bottom-nav { display: flex; }
+    
+    /* Ajustes generales body móvil */
+    body {
+        padding-top: 0; /* Navbar es flotante, manejamos padding en contenedores */
+    }
 
-/* ===== ESTILOS DE PAGINACIÓN ===== */
-.pagination-container {
-  margin-top: 40px;
-  margin-bottom: 40px;
-}
+    /* Navbar superior simplificada */
+    .navbar-custom { padding: 15px; background: transparent; }
+    .navbar-nav-desktop { display: none !important; }
 
-.pagination {
-  display: inline-flex;
-  justify-content: center;
-  gap: 15px;
-  align-items: center;
-}
+    /* Ajuste de Héroe */
+    .hero-section {
+        align-items: center; /* Centrado vertical */
+        padding-top: 0;
+    }
+    .hero-title { font-size: 2.5rem; }
+    .hero-content { padding: 0 20px; }
 
-.page-button {
-  padding: 8px 15px;
-  border-radius: 50%;
-  background-color: #f1f1f1;
-  color: #333;
-  text-decoration: none;
-  font-weight: bold;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  width: 30px;
-  height: 30px;
-  text-align: center;
-}
+    /* Ajuste de Grids */
+    .movies-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .genres-grid { grid-template-columns: repeat(2, 1fr); }
 
-.page-button.active {
-  background-color: #FFD700;
-  color: white;
-}
-
-.page-button:hover {
-  background-color: #ddd;
-}
-
-.page-button:active {
-  background-color: #bbb;
-}
-
-.page-button:focus {
-  outline: none;
+    /* Ajuste para Preferencias (Evitar choque con logo) */
+    .pref-header { padding-top: 130px !important; }
+    
+    /* Botón flotante encima de la barra de navegación */
+    .save-bar-container { bottom: 110px !important; }
 }

@@ -70,6 +70,69 @@
         margin-top: 30px; transition: transform 0.2s;
     }
     .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2); }
+
+    /* =========================================
+       OPTIMIZACIÓN MÓVIL (AÑADIDO)
+       ========================================= */
+    @media (max-width: 768px) {
+        /* Ajuste del contenedor principal para ganar espacio */
+        .container.py-5 {
+            padding-top: 20px !important;
+            padding-left: 15px;
+            padding-right: 15px;
+            padding-bottom: 100px; /* Espacio para la barra de navegación inferior */
+        }
+
+        /* Tarjeta del formulario más limpia en móvil */
+        .form-card {
+            padding: 20px 15px; /* Reducimos el padding de 40px a 15px */
+            border: none; /* Quitamos bordes para que se sienta más nativo */
+            background: transparent; /* Fondo limpio */
+            box-shadow: none;
+        }
+
+        /* Sección OMDB compacta */
+        .omdb-section {
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+        
+        /* En móvil, ponemos el botón de buscar abajo del input para que sea más fácil tocarlo */
+        .input-group-omdb {
+            flex-direction: column;
+            gap: 10px;
+        }
+        .input-group-omdb .form-control {
+            border-radius: 8px !important;
+            border-right: 1px solid #333; /* Restauramos borde derecho */
+            width: 100%;
+        }
+        .btn-omdb {
+            width: 100%;
+            border-radius: 8px !important;
+            padding: 10px;
+        }
+
+        /* Preview del Poster */
+        .poster-preview-box {
+            max-width: 180px; /* Limitamos el ancho para que no sea gigante */
+            margin: 0 auto 20px auto; /* Centrado */
+            border-width: 2px;
+        }
+
+        /* Grid de Géneros: Forzamos 2 columnas en pantallas pequeñas */
+        .genre-grid {
+            grid-template-columns: 1fr 1fr; 
+            gap: 8px;
+        }
+        .genre-check-label {
+            padding: 8px 5px;
+            font-size: 0.8rem;
+        }
+
+        /* Títulos */
+        h2 { font-size: 1.5rem; }
+    }
 </style>
 {% endblock %}
 
@@ -227,7 +290,6 @@
                 }
 
                 // Buscar trailer solo si el input existe (es admin)
-                // Usamos un pequeño timeout para que no bloquee la UI
                 setTimeout(() => autoFindTrailer(data.Title), 500);
 
             } else {
@@ -245,9 +307,6 @@
 
     // --- FUNCIÓN BÚSQUEDA TRAILER (SEGURA) ---
     async function autoFindTrailer(titleOverride = null) {
-        // VERIFICACIÓN DE SEGURIDAD:
-        // Si el usuario no es admin, este input no existe en el HTML.
-        // Si no existe, salimos de la función silenciosamente.
         const trailerInput = document.getElementById('trailer_url');
         if (!trailerInput) return;
 

@@ -4,51 +4,62 @@
 
 {% block head %}
 <style>
-    /* Hero Section estilo Cine Premium */
-    .hero-section {
-        height: 90vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
-        position: relative;
-        overflow: hidden;
+    /* --- CONFIGURACIÓN DE PANTALLA COMPLETA --- */
+    html, body {
+        /* Aseguramos fondo negro base */
+        background-color: #000;
+        margin: 0;
+        padding: 0;
     }
 
-    /* Efectos de luz dinámicos */
+    .hero-section {
+        /* Ocupa el 100% de la altura visible MENOS la altura aprox del navbar */
+        min-height: calc(100vh - 70px); 
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;     /* Centrado Horizontal */
+        justify-content: center; /* Centrado Vertical */
+        text-align: center;
+        background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+        position: relative;
+        overflow: hidden;
+        /* Un poco de padding abajo para que no pegue con la barra móvil */
+        padding-bottom: 20px; 
+    }
+
+    /* Efecto de luz de fondo */
     .hero-glow {
         position: absolute;
-        width: 800px;
-        height: 800px;
-        background: radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, transparent 70%);
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(255, 215, 0, 0.08) 0%, transparent 70%);
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         pointer-events: none;
-        animation: pulse-glow 4s ease-in-out infinite;
-    }
-
-    @keyframes pulse-glow {
-        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
-        50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        z-index: 1;
     }
 
     .hero-content {
         position: relative;
         z-index: 2;
-        max-width: 900px;
-        padding: 40px 20px;
+        width: 100%;
+        max-width: 600px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
+    /* TÍTULO */
     .hero-title {
-        font-size: 4.5rem;
+        font-size: 3.5rem;
         font-weight: 900;
         color: #fff;
-        margin-bottom: 25px;
+        margin-bottom: 10px;
+        line-height: 1.1;
         letter-spacing: -1px;
-        line-height: 1.15;
-        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
     }
 
     .hero-title span {
@@ -56,68 +67,86 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        text-shadow: none;
     }
 
+    /* SUBTÍTULO */
     .hero-subtitle {
-        font-size: 1.35rem;
-        color: rgba(255, 255, 255, 0.7);
-        margin-bottom: 50px;
-        font-weight: 300;
-        line-height: 1.6;
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 30px;
+        line-height: 1.5;
+        max-width: 80%;
     }
 
-    /* Contenedor de botones ajustado */
+    /* BOTONES */
     .hero-buttons {
         display: flex;
-        gap: 20px;
-        justify-content: center;
-        flex-wrap: wrap;
-        max-width: 800px;
-        margin: 0 auto;
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        max-width: 350px; /* Ancho máximo de botones */
     }
 
     .btn-cta {
         background: linear-gradient(135deg, #FFD700 0%, #FFC700 100%);
         color: #000;
         font-weight: 800;
-        padding: 16px 35px;
+        padding: 16px;
         border-radius: 50px;
         font-size: 1rem;
         text-transform: uppercase;
-        letter-spacing: 1.2px;
+        letter-spacing: 1px;
         border: none;
-        transition: all 0.3s;
         text-decoration: none;
-        display: inline-flex;
+        display: flex;
         align-items: center;
+        justify-content: center;
         gap: 10px;
-        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+        box-shadow: 0 5px 20px rgba(255, 215, 0, 0.2);
+        transition: transform 0.2s;
     }
 
-    .btn-cta:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4);
-        background: linear-gradient(135deg, #FFC700 0%, #FFB700 100%);
-        color: #000;
-        text-decoration: none;
-    }
+    .btn-cta:active { transform: scale(0.97); }
 
     .btn-cta-secondary {
         background: transparent;
         color: #FFD700;
-        border: 2px solid #FFD700;
-        font-weight: 700;
-        box-shadow: none; /* Sin sombra por defecto en secundarios */
+        border: 2px solid rgba(255, 215, 0, 0.3);
+        box-shadow: none;
+    }
+    
+    .btn-cta-secondary:active { 
+        background: rgba(255,215,0,0.1); 
+        border-color: #FFD700;
     }
 
-    .btn-cta-secondary:hover {
-        background: rgba(255, 215, 0, 0.1);
-        color: #FFD700;
-        text-decoration: none;
-        box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
-    }
+    /* --- AJUSTES MÓVIL (PANTALLA PEQUEÑA) --- */
+    @media (max-width: 768px) {
+        .hero-section {
+            /* En móvil, usamos dvh para evitar problemas con la barra de URL */
+            min-height: 85dvh; 
+            padding-bottom: 80px; /* Espacio para barra inferior */
+        }
 
+        .hero-title {
+            font-size: 2.5rem; /* Título más pequeño */
+        }
+
+        .hero-subtitle {
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+
+        .hero-buttons {
+            gap: 12px;
+            width: 100%;
+        }
+
+        .btn-cta {
+            padding: 14px;
+            font-size: 0.9rem;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -126,37 +155,39 @@
 <div class="hero-section">
     <div class="hero-glow"></div>
     
-    <div class="hero-content animate">
+    <div class="hero-content">
         <h1 class="hero-title">
             Tu Universo de <br>
             <span>Cine Premium</span>
         </h1>
         <p class="hero-subtitle">
-            Explora nuestro catálogo completo de películas<br>
-            Basado en tus preferencias, descubre recomendaciones personalizadas
+            Explora nuestro catálogo, usa la IA y descubre tu próxima película favorita.
         </p>
         
         <div class="hero-buttons">
             <a href="{{ url_for('movies.list_movies') }}" class="btn-cta">
-                <i class="bi bi-play-circle"></i> Ver Catálogo
+                <i class="bi bi-play-circle-fill"></i> Ver Catálogo
             </a>
 
             {% if current_user.is_authenticated %}
-                <a href="{{ url_for('ai.adventure_mode') }}" class="btn-cta">
-                    <i class="bi bi-stars"></i> Modo Aventura
+                <a href="{{ url_for('ai.concierge') }}" class="btn-cta">
+                    <i class="bi bi-stars"></i> TOBUCKS IA
                 </a>
 
                 <a href="{{ url_for('recommendations.recommendations') }}" class="btn-cta btn-cta-secondary">
-                    <i class="bi bi-lightning-charge"></i> Mis Recomendaciones
+                    <i class="bi bi-lightning-charge-fill"></i> Mis Recomendaciones
                 </a>
                 
                 <a href="{{ url_for('users.preferences') }}" class="btn-cta btn-cta-secondary">
-                    <i class="bi bi-sliders"></i> Preferencias
+                    <i class="bi bi-sliders"></i> Personaliza tus gustos
                 </a>
                 
             {% else %}
                 <a href="{{ url_for('users.register') }}" class="btn-cta btn-cta-secondary">
-                    <i class="bi bi-pencil"></i> Registrarse
+                    <i class="bi bi-person-plus-fill"></i> Crear Cuenta
+                </a>
+                <a href="{{ url_for('users.login') }}" class="btn-cta btn-cta-secondary" style="border: none; color: #fff; opacity: 0.7;">
+                    Ya tengo cuenta
                 </a>
             {% endif %}
         </div>

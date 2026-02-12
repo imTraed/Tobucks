@@ -4,273 +4,299 @@
 
 {% block head %}
 <style>
-  /* --- ESTÉTICA GENERAL --- */
-  body { background-color: #050505; }
+    /* --- BASE --- */
+    body { 
+        background-color: #000; 
+        color: #fff; 
+        padding-bottom: 220px !important; 
+    }
 
-  .section-title {
-    font-size: 0.9rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.5);
-    margin-bottom: 1rem;
-    text-align: center;
-  }
+    /* --- HEADER (TÍTULO) --- */
+    .pref-header {
+        text-align: center; 
+        padding: 60px 20px 20px; 
+        background: radial-gradient(circle at center top, rgba(255, 215, 0, 0.1), transparent 70%);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .pref-title { 
+        font-size: 2.5rem; 
+        font-weight: 800; 
+        margin-bottom: 10px; 
+        color: #fff; 
+        letter-spacing: -1px;
+    }
+    
+    .pref-desc { 
+        color: #8e8e93; 
+        font-size: 1rem; 
+        max-width: 500px; 
+        margin: 0 auto; 
+    }
 
-  /* --- CHIPS DE GÉNEROS --- */
-  .genre-checkbox { display: none; }
+    /* --- GRID DE GÉNEROS --- */
+    .genres-grid {
+        display: grid; 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 15px;
+        padding: 20px; 
+        max-width: 1000px; 
+        margin: 0 auto;
+    }
 
-  .genre-chip-label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 25px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 50px;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    user-select: none;
-    font-size: 0.9rem;
-  }
+    @media (min-width: 768px) {
+        .genres-grid {
+            grid-template-columns: repeat(4, 1fr); 
+        }
+    }
 
-  
-  .chip-icon { 
-    margin-right: 10px; 
-    font-size: 1.1rem; 
-    transition: transform 0.2s;
-  }
+    /* --- CORRECCIONES MÓVIL --- */
+    @media (max-width: 991px) {
+        .pref-header {
+            padding-top: 25px; 
+            padding-bottom: 10px;
+        }
+        .pref-title {
+            font-size: 2rem;
+        }
 
-  .genre-chip-label:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
-    color: white;
-    transform: translateY(-2px);
-  }
+        /* AJUSTE BOTÓN FLOTANTE MÓVIL */
+        .save-bar-container {
+            bottom: 110px !important; 
+            padding-bottom: 0 !important;
+            background: transparent !important; 
+        }
+        
+        .btn-save-float {
+            width: 90% !important; 
+            box-shadow: none !important; /* SIN SOMBRA EN MÓVIL */
+        }
+    }
 
-  /* --- ESTADO: SELECCIONADO (AMARILLO) --- */
-  .genre-checkbox:checked + .genre-chip-label {
-    background: #FFD700;
-    border-color: #FFD700;
-    color: #000;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-    transform: scale(1.05);
-    font-weight: 800;
-  }
-  
-  .genre-checkbox:checked + .genre-chip-label .chip-icon {
-    transform: rotate(-10deg) scale(1.2);
-  }
+    /* --- TARJETA DE GÉNERO --- */
+    .genre-checkbox { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+    
+    .genre-card {
+        position: relative; 
+        background: #1c1c1e; 
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px; 
+        padding: 25px 10px; 
+        text-align: center;
+        cursor: pointer; 
+        transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); 
+        min-height: 120px;
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center;
+    }
 
-  /* BOTÓN DE GUARDAR */
-  .btn-save-profile {
-    background: linear-gradient(45deg, #FFD700, #FFC107);
-    border: none;
-    color: #000;
-    font-weight: 800;
-    letter-spacing: 1px;
-    padding: 15px 50px;
-    border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
-    transition: all 0.3s;
-    text-transform: uppercase;
-  }
-  
-  .btn-save-profile:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
-  }
-  
-  .btn-clear-all {
-    color: #dc3545;
-    border: 1px solid rgba(220, 53, 69, 0.3);
-    background: transparent;
-    border-radius: 50px;
-    padding: 5px 15px;
-    font-size: 0.8rem;
-    transition: all 0.2s;
-  }
-  .btn-clear-all:hover {
-    background: rgba(220, 53, 69, 0.1);
-    border-color: #dc3545;
-  }
+    .genre-icon { 
+        font-size: 2rem; 
+        color: #555; 
+        margin-bottom: 12px; 
+        transition: color 0.2s, transform 0.2s; 
+    }
+    
+    .genre-name { 
+        font-weight: 600; 
+        font-size: 0.95rem; 
+        color: #aaa; 
+        text-transform: capitalize; 
+    }
+
+    /* --- ESTADO SELECCIONADO --- */
+    .genre-checkbox:checked + .genre-card {
+        background: rgba(255, 215, 0, 0.15); 
+        border-color: #FFD700; 
+        transform: translateY(-3px);
+        /* Mantenemos una sombra sutil SOLO en las tarjetas seleccionadas, no en el botón */
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+    .genre-checkbox:checked + .genre-card .genre-icon { 
+        color: #FFD700; 
+        transform: scale(1.1); 
+    }
+    .genre-checkbox:checked + .genre-card .genre-name { 
+        color: #fff; 
+        font-weight: 800; 
+    }
+    
+    .check-indicator {
+        position: absolute; top: 10px; right: 10px; width: 22px; height: 22px;
+        background: #FFD700; border-radius: 50%; display: flex; align-items: center; 
+        justify-content: center; font-size: 14px; color: #000; opacity: 0; transform: scale(0); transition: all 0.2s;
+    }
+    .genre-checkbox:checked + .genre-card .check-indicator { opacity: 1; transform: scale(1); }
+
+    /* --- BOTÓN BORRAR (ADMIN) --- */
+    .btn-delete-genre {
+        position: absolute; top: 5px; left: 5px; width: 30px; height: 30px;
+        background: rgba(220, 53, 69, 0.2); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.5);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 14px; z-index: 10; transition: all 0.2s; cursor: pointer;
+    }
+    .btn-delete-genre:hover { background: #dc3545; color: white; transform: scale(1.1); }
+
+    /* --- FOOTER FLOTANTE (BOTÓN GUARDAR) --- */
+    .save-bar-container {
+        position: fixed; 
+        bottom: 30px; 
+        left: 0; right: 0; z-index: 1020; 
+        display: flex; justify-content: center;
+        padding: 0 20px 20px;
+        background: transparent; /* Fondo transparente */
+        pointer-events: none;
+    }
+    
+    .btn-save-float {
+        pointer-events: auto; width: 100%; max-width: 500px;
+        background: linear-gradient(135deg, #FFD700, #FFA500); color: #000;
+        font-weight: 800; border: none; padding: 16px; border-radius: 50px;
+        font-size: 1.1rem;
+        
+        /* SIN SOMBRA AQUÍ TAMBIÉN */
+        box-shadow: none !important; 
+        
+        text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px;
+        transition: transform 0.2s;
+    }
+    .btn-save-float:active { transform: scale(0.96); }
+    
+    #savingIndicator {
+        position: fixed; top: 120px; left: 50%; transform: translateX(-50%);
+        padding: 10px 25px; border-radius: 30px; font-weight: 700; font-size: 0.9rem;
+        z-index: 2000; display: none; box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            
-            <div class="mb-5 text-center">
-                <h6 class="text-warning text-uppercase small mb-2" style="letter-spacing: 3px;">Personalización</h6>
-                <h1 class="display-4 fw-bold text-white mb-3">¿Qué te gusta ver?</h1>
-                <p class="text-white-50 lead">
-                    Selecciona tus géneros favoritos para que nuestra IA afine tus recomendaciones.
-                </p>
-            </div>
 
-            <form id="preferencesForm">
+<div class="pref-header">
+    <h1 class="pref-title">Mis Gustos</h1>
+    <p class="pref-desc">Selecciona tus favoritos y nuestra IA te recomendará películas personalizadas.</p>
+</div>
+
+<form id="preferencesForm">
+    <div class="genres-grid">
+        {% for genre in genres %}
+            <div style="position: relative;">
                 
-                <div class="d-flex justify-content-end mb-3 px-2">
-                    <button type="button" class="btn-clear-all" onclick="clearAllGenres()">
-                        <i class="bi bi-trash3 me-1"></i> Quitar todos
-                    </button>
-                </div>
+                {% if current_user.is_admin %}
+                <button type="button" class="btn-delete-genre" onclick="deleteGenre(event, '{{ genre.id }}', '{{ genre.name }}')">
+                    <i class="bi bi-trash3-fill"></i>
+                </button>
+                {% endif %}
 
-                <div class="d-flex flex-wrap gap-3 justify-content-center mb-5">
-                    {% for genre in genres %}
+                <label style="width: 100%; display: block; margin: 0;">
+                    <input type="checkbox" name="genres" value="{{ genre.id }}" class="genre-checkbox"
+                        {% if user_genre_ids and genre.id in user_genre_ids %}checked{% endif %}>
                     
-                    {% set icon = 'bi-film' %}
-                    {% if 'Action' in genre.name or 'Acción' in genre.name %}{% set icon = 'bi-fire' %}
-                    {% elif 'Adventure' in genre.name or 'Aventura' in genre.name %}{% set icon = 'bi-compass' %}
-                    {% elif 'Animation' in genre.name or 'Animación' in genre.name %}{% set icon = 'bi-magic' %}
-                    {% elif 'Comedy' in genre.name or 'Comedia' in genre.name %}{% set icon = 'bi-emoji-laughing' %}
-                    {% elif 'Crime' in genre.name or 'Crimen' in genre.name %}{% set icon = 'bi-fingerprint' %}
-                    {% elif 'Documentary' in genre.name or 'Documental' in genre.name %}{% set icon = 'bi-camera-reels' %}
-                    {% elif 'Drama' in genre.name %}{% set icon = 'bi-masks-theater' %}
-                    {% elif 'Family' in genre.name or 'Familia' in genre.name %}{% set icon = 'bi-house-heart' %}
-                    {% elif 'Fantasy' in genre.name or 'Fantasía' in genre.name %}{% set icon = 'bi-stars' %}
-                    {% elif 'History' in genre.name or 'Historia' in genre.name %}{% set icon = 'bi-hourglass-split' %}
-                    {% elif 'Horror' in genre.name or 'Terror' in genre.name %}{% set icon = 'bi-ghost' %}
-                    {% elif 'Music' in genre.name or 'Música' in genre.name %}{% set icon = 'bi-music-note-beamed' %}
-                    {% elif 'Mystery' in genre.name or 'Misterio' in genre.name %}{% set icon = 'bi-search' %}
-                    {% elif 'Romance' in genre.name %}{% set icon = 'bi-heart-fill' %}
-                    {% elif 'Sci-Fi' in genre.name or 'Ciencia' in genre.name %}{% set icon = 'bi-rocket-takeoff' %}
-                    {% elif 'Sport' in genre.name or 'Deporte' in genre.name %}{% set icon = 'bi-trophy' %}
-                    {% elif 'Thriller' in genre.name or 'Suspenso' in genre.name %}{% set icon = 'bi-eye' %}
-                    {% elif 'War' in genre.name or 'Guerra' in genre.name %}{% set icon = 'bi-shield-shaded' %}
-                    {% elif 'Western' in genre.name %}{% set icon = 'bi-star' %}
-                    {% endif %}
-
-                    <div class="genre-item">
-                        <input type="checkbox" 
-                               class="genre-checkbox" 
-                               id="genre_{{ genre.id }}" 
-                               name="genres" 
-                               value="{{ genre.id }}"
-                               {% if user_genre_ids and genre.id in user_genre_ids %}checked{% endif %}>
-                        
-                        <label class="genre-chip-label" for="genre_{{ genre.id }}">
-                            <i class="bi {{ icon }} chip-icon"></i>
-                            {{ genre.name }}
-                        </label>
+                    <div class="genre-card">
+                        <div class="check-indicator"><i class="bi bi-check-lg"></i></div>
+                        <i class="bi bi-film genre-icon" data-genre="{{ genre.name }}"></i>
+                        <span class="genre-name">{{ genre.name }}</span>
                     </div>
-                    {% endfor %}
-                </div>
-
-                <div class="d-flex justify-content-center gap-3">
-                    <a href="{{ url_for('main.index') }}" class="btn btn-outline-light btn-lg px-4 rounded-pill" style="border-color: rgba(255,255,255,0.2);">
-                        Volver
-                    </a>
-                    <button type="button" class="btn btn-save-profile" onclick="savePreferences()">
-                        Guardar Mis Gustos
-                    </button>
-                </div>
-
-            </form>
-        </div>
+                </label>
+            </div>
+        {% endfor %}
     </div>
+</form>
+
+<div id="savingIndicator"></div>
+
+<div class="save-bar-container">
+    <button type="button" class="btn-save-float" onclick="savePreferences()">
+        <i class="bi bi-save2-fill"></i> GUARDAR GUSTOS
+    </button>
 </div>
 
 <script>
-    // --- GUARDADO MANUAL CON BOTÓN ---
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        // Prevenir que el formulario tradicional se envíe
-        document.getElementById('preferencesForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            savePreferences();
+    // ICONOS AUTOMÁTICOS
+    document.addEventListener("DOMContentLoaded", () => {
+        const iconsMap = {
+            'acción': 'bi-fire', 'action': 'bi-fire',
+            'aventura': 'bi-compass-fill', 'adventure': 'bi-compass-fill',
+            'comedia': 'bi-emoji-laughing-fill', 'comedy': 'bi-emoji-laughing-fill',
+            'drama': 'bi-suit-spade-fill',
+            'terror': 'bi-emoji-astonished-fill', 'horror': 'bi-emoji-astonished-fill',
+            'romance': 'bi-heart-fill',
+            'ciencia': 'bi-rocket-takeoff-fill', 'sci-fi': 'bi-rocket-takeoff-fill',
+            'fantasía': 'bi-stars', 'fantasy': 'bi-stars',
+            'animación': 'bi-magic', 'animation': 'bi-magic',
+            'crimen': 'bi-fingerprint', 'crime': 'bi-fingerprint',
+            'misterio': 'bi-search', 'mystery': 'bi-search',
+            'thriller': 'bi-eye-fill', 'suspense': 'bi-eye-fill', 'suspenso': 'bi-eye-fill',
+            'documental': 'bi-camera-reels-fill', 'documentary': 'bi-camera-reels-fill',
+            'historia': 'bi-bank', 'history': 'bi-bank',
+            'guerra': 'bi-shield-shaded', 'war': 'bi-shield-shaded',
+            'música': 'bi-music-note-beamed', 'music': 'bi-music-note-beamed',
+            'familia': 'bi-house-heart-fill', 'family': 'bi-house-heart-fill',
+            'biografía': 'bi-person-vcard-fill', 'biography': 'bi-person-vcard-fill',
+            'western': 'bi-brightness-high-fill'
+        };
+
+        document.querySelectorAll('.genre-icon').forEach(icon => {
+            const name = icon.getAttribute('data-genre').toLowerCase();
+            let found = false;
+            for (const [key, val] of Object.entries(iconsMap)) {
+                if (name.includes(key)) {
+                    icon.className = `bi ${val} genre-icon`;
+                    found = true; break;
+                }
+            }
+            if (!found) icon.className = `bi bi-film genre-icon`;
         });
     });
 
+    // GUARDAR (AJAX)
     function savePreferences() {
-        // Obtener los IDs de los géneros seleccionados
         const checkboxes = document.querySelectorAll('.genre-checkbox:checked');
         const selectedIds = Array.from(checkboxes).map(cb => cb.value);
-        
-        // Crear FormData para enviar por AJAX
         const formData = new FormData();
-        selectedIds.forEach(id => {
-            formData.append('genres', id);
-        });
+        selectedIds.forEach(id => formData.append('genres', id));
         
-        // Mostrar un indicador visual de que se está guardando
-        showSavingIndicator(true);
+        showIndicator('Guardando...', '#333');
         
-        // Enviar la solicitud AJAX
-        fetch('{{ url_for("users.preferences") }}', {
-            method: 'POST',
-            body: formData
+        fetch('{{ url_for("preferences.update_preferences") }}', { 
+            method: 'POST', body: formData, headers: {'X-Requested-With': 'XMLHttpRequest'}
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error al guardar preferencias');
-            }
-            return response.json();
-        })
+        .then(res => res.json())
+        .then(data => showIndicator('¡Gustos Guardados!', '#28a745', 2000))
+        .catch(err => showIndicator('Error al guardar', '#dc3545', 3000));
+    }
+
+    // BORRAR GÉNERO
+    function deleteGenre(event, id, name) {
+        event.preventDefault(); 
+        if(!confirm(`¿Eliminar "${name}" permanentemente?`)) return;
+
+        showIndicator('Eliminando...', '#dc3545');
+
+        fetch(`/preferences/delete_genre/${id}`, { method: 'POST' })
+        .then(res => res.json())
         .then(data => {
-            // Mostrar éxito
-            showSavingIndicator(false, true);
-            console.log('✓ Preferencias guardadas correctamente');
-        })
-        .catch(error => {
-            // Mostrar error
-            showSavingIndicator(false, false);
-            console.error('✗ Error al guardar:', error);
+            if(data.success) {
+                const btn = event.target.closest('button');
+                const container = btn.closest('div'); 
+                container.style.transition = "opacity 0.3s";
+                container.style.opacity = '0';
+                setTimeout(() => container.remove(), 300);
+                showIndicator('Eliminado', '#28a745', 2000);
+            } else {
+                alert('Error al eliminar');
+            }
         });
     }
 
-    function showSavingIndicator(isSaving, isSuccess = null) {
-        let indicator = document.getElementById('savingIndicator');
-        
-        // Crear el indicador si no existe
-        if (!indicator) {
-            indicator = document.createElement('div');
-            indicator.id = 'savingIndicator';
-            indicator.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 12px 20px;
-                border-radius: 8px;
-                font-weight: 600;
-                z-index: 9999;
-                display: none;
-            `;
-            document.body.appendChild(indicator);
-        }
-        
-        if (isSaving) {
-            indicator.textContent = '⏳ Guardando...';
-            indicator.style.background = '#FFC107';
-            indicator.style.color = '#000';
-            indicator.style.display = 'block';
-        } else if (isSuccess) {
-            indicator.textContent = '✓ Guardado';
-            indicator.style.background = '#28a745';
-            indicator.style.color = 'white';
-            indicator.style.display = 'block';
-            setTimeout(() => {
-                indicator.style.display = 'none';
-            }, 2000);
-        } else {
-            indicator.textContent = '✗ Error al guardar';
-            indicator.style.background = '#dc3545';
-            indicator.style.color = 'white';
-            indicator.style.display = 'block';
-            setTimeout(() => {
-                indicator.style.display = 'none';
-            }, 3000);
-        }
-    }
-
-    // Botón "Quitar todos"
-    function clearAllGenres() {
-        const checkboxes = document.querySelectorAll('.genre-checkbox');
-        checkboxes.forEach(cb => cb.checked = false);
+    function showIndicator(text, color, hideTime = 0) {
+        const el = document.getElementById('savingIndicator');
+        el.innerHTML = text; el.style.background = color; el.style.color = '#fff'; el.style.display = 'block';
+        if(hideTime > 0) setTimeout(() => { el.style.display = 'none'; }, hideTime);
     }
 </script>
+
 {% endblock %}

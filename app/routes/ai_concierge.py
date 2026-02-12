@@ -1,22 +1,19 @@
-"""IA Concierge: recomendaciones de películas con IA Gemini"""
+"""IA Concierge: recomendaciones de películas con Groq (Catálogo Completo)"""
 from flask import Blueprint, render_template, request, jsonify, current_app
 from flask_login import login_required, current_user
-import google.generativeai as genai
-from google.generativeai.types import HarmCategory, HarmBlockThreshold
-import requests
-import json
 import os
+import json
 import uuid
-import re
+import requests
+from groq import Groq
 from .. import db
 from ..models.models import Movie, Genre
 
 ai_bp = Blueprint("ai", __name__, url_prefix="/ai")
 
 def download_poster(img_url):
-    """Descargar y guardar póster de película"""
-    if not img_url or img_url == 'N/A' or not img_url.startswith('http'): 
-        return None
+    """Descarga póster si no existe"""
+    if not img_url or img_url == 'N/A' or not img_url.startswith('http'): return None
     try:
         resp = requests.get(img_url, timeout=10)
         if resp.status_code == 200:
@@ -28,192 +25,150 @@ def download_poster(img_url):
             with open(os.path.join(save_dir, filename), 'wb') as f:
                 f.write(resp.content)
             return f"uploads/{filename}"
-    except: 
-        return None
+    except: return None
 
 @ai_bp.route("/concierge")
 @login_required
 def concierge():
-    """Página del asistente IA"""
     return render_template("ai_concierge.html")
 
 @ai_bp.route("/ask_adventure", methods=["POST"])
 @login_required
 def ask_adventure():
-    """Procesar solicitud de recomendaciones IA"""
     data = request.json
-    narrative_profile = data.get('narrative', '')
+    narrative = data.get('narrative', '')
 
-    api_key = current_app.config.get('GOOGLE_API_KEY')
+    groq_key = current_app.config.get('GROQ_API_KEY') or os.environ.get('GROQ_API_KEY')
     omdb_key = current_app.config.get('OMDB_API_KEY')
 
-    if not api_key: 
-        return jsonify({'error': 'Falta API Key de Google'}), 500
+    if not groq_key: return jsonify({'error': 'Falta GROQ_API_KEY'}), 500
 
-    # Obtener catálogo de películas disponibles
-    existing_movies = Movie.query.with_entities(Movie.title).limit(800).all()
-    catalog_list = [m.title for m in existing_movies]
-    catalog_str = ", ".join(catalog_list) if catalog_list else "Inventario vacío."
-
-    # Obtener películas ya vistas por el usuario
-    seen_titles_str = ""
-    if current_user.is_authenticated:
-        seen_titles = [m.title for m in current_user.seen_list]
-        if seen_titles:
-            seen_titles_str = ", ".join(seen_titles[-100:])
-
-    # Configurar IA Gemini
-    genai.configure(api_key=api_key)
-    
-    # Configuración de seguridad
-    safety_settings = {
-        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-    }
-
-    # Seleccionar modelo
-    chosen_model = 'models/gemini-1.5-flash'
+    # 1. OBTENER CATÁLOGO COMPLETO (Sin límites, como pediste)
     try:
-        for m in genai.list_models():
-            if 'generateContent' in m.supported_generation_methods and 'gemini' in m.name:
-                chosen_model = m.name
-                break
+        # Traemos TODOS los títulos de la base de datos
+        all_movies = Movie.query.with_entities(Movie.title).all()
+        catalog_str = ", ".join([m.title for m in all_movies]) if all_movies else "Vacío."
     except: 
-        pass
+        catalog_str = "No disponible."
 
-    # Prompt estratégico para IA
-    system_instruction = f"""
-    Eres un experto en cine.
-    
-    Perfil del usuario: "{narrative_profile}"
-    Catálogo disponible: [{catalog_str}]
-    Películas ya vistas: [{seen_titles_str}]
+    # Historial de vistas (Últimas 50 para mantener contexto relevante)
+    seen_str = ""
+    if current_user.is_authenticated:
+        try:
+            seen = [m.title for m in current_user.seen_list][-50:]
+            seen_str = ", ".join(seen)
+        except: pass
 
-    REGLAS:
-    1. NO recomendes películas ya vistas.
-    2. Si piden un género/época no en el catálogo, recomienda clásicos mundiales.
-    3. Devuelve SOLO JSON válido sin markdown.
-
-    JSON:
-    {{
-        "top_picks": [
-            {{"title": "Título Original", "reason": "Por qué verla en español."}}
-        ],
-        "also_like": [
-            {{"title": "Título Extra"}}
-        ]
-    }}
-    """
-
+    # 2. Consultar Groq
     try:
-        print(f"🔮 Consultando IA...")
-        model = genai.GenerativeModel(chosen_model)
+        client = Groq(api_key=groq_key)
         
-        response = model.generate_content(
-            system_instruction, 
-            safety_settings=safety_settings
+        # Usamos Llama 3 70B para mejor razonamiento con contextos grandes
+        chosen_model = "llama-3.3-70b-versatile"
+
+        # Prompt del Sistema
+        system_prompt = f"""
+        Eres experto en cine.
+        CATÁLOGO COMPLETO: [{catalog_str}]
+        YA VISTAS: [{seen_str}]
+        
+        REGLAS:
+        1. Contexto "Familia" = CERO contenido adulto.
+        2. PRIORIZA SIEMPRE películas del CATÁLOGO LOCAL si encajan.
+        3. Si no hay opciones en el catálogo, sugiere clásicos globales.
+        4. NO repetir vistas.
+        5. Genera 3 "top_picks" y 5 "also_like".
+        """
+
+        # Prompt del Usuario
+        user_prompt = f"""
+        Perfil: "{narrative}"
+        
+        Responde con este JSON exacto:
+        {{
+          "top_picks": [
+             {{ "title": "Peli 1", "reason": "Breve motivo" }},
+             {{ "title": "Peli 2", "reason": "Breve motivo" }},
+             {{ "title": "Peli 3", "reason": "Breve motivo" }}
+          ],
+          "also_like": [
+             {{ "title": "Extra 1" }}, {{ "title": "Extra 2" }}, {{ "title": "Extra 3" }}, {{ "title": "Extra 4" }}, {{ "title": "Extra 5" }}
+          ]
+        }}
+        """
+
+        print(f"🚀 Groq ({chosen_model})...")
+        
+        # Aumentamos max_tokens para asegurar que la respuesta quepa completa
+        completion = client.chat.completions.create(
+            model=chosen_model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.5, 
+            max_tokens=2048, 
+            top_p=1,
+            stream=False,
+            response_format={"type": "json_object"}
         )
-        
-        # Extraer JSON de la respuesta
-        text_response = response.text
-        json_match = re.search(r'\{.*\}', text_response, re.DOTALL)
-        
-        if json_match:
-            clean_json = json_match.group(0)
-            raw_data = json.loads(clean_json)
-        else:
-            raise ValueError("JSON inválido.")
+
+        raw_data = json.loads(completion.choices[0].message.content)
 
     except Exception as e:
-        print(f"❌ Error IA: {e}")
-        return jsonify({'error': f'Error: {str(e)}'}), 500
+        err = str(e)
+        print(f"❌ Error Groq: {err}")
+        if "429" in err: return jsonify({'error': '⚠️ IA saturada. Espera 10s.'}), 429
+        # Si el error es por contexto muy largo (muchas películas), avisamos
+        if "context_length_exceeded" in err: return jsonify({'error': '⚠️ El catálogo es demasiado grande para la IA.'}), 400
+        return jsonify({'error': 'Error IA.'}), 500
 
-    # Procesar películas recomendadas
-    def process_movie_list(items_list):
-        processed = []
-        for item in items_list:
+    # 3. Procesar Resultados
+    def process(items):
+        res = []
+        for item in items:
             title = item.get('title')
-            reason = item.get('reason', '')
-            if not title: 
-                continue
-
-            # Buscar en base de datos local
+            if not title: continue
+            
+            # Buscar local
             movie = Movie.query.filter(Movie.title.ilike(title)).first()
-            if not movie:
-                movie = Movie.query.filter(Movie.title.ilike(f"%{title}%")).first()
+            if not movie: movie = Movie.query.filter(Movie.title.ilike(f"%{title}%")).first()
 
-            # Si no existe, intentar agregar desde OMDb
+            # Importar OMDb si falta (Solo si la IA alucinó algo que no estaba en la lista o si falló el match exacto)
             if not movie and omdb_key:
                 try:
-                    omdb_data = requests.get(f'http://www.omdbapi.com/?t={title}&apikey={omdb_key}').json()
-                    if omdb_data.get('Response') == 'True':
-                        poster_path = download_poster(omdb_data.get('Poster'))
+                    r = requests.get(f'http://www.omdbapi.com/?t={title}&apikey={omdb_key}', timeout=3).json()
+                    if r.get('Response') == 'True':
+                        poster = download_poster(r.get('Poster'))
+                        movie = Movie(title=r.get('Title'), description=r.get('Plot'), poster=poster)
                         
-                        if poster_path:
-                            new_movie = Movie(
-                                title=omdb_data.get('Title'),
-                                description=omdb_data.get('Plot', 'Sin descripción'),
-                                poster=poster_path,
-                                trailer_url=None
-                            )
-                            
-                            # Asignar géneros
-                            genre_mapping = {
-                                "Action": "Acción", "Adventure": "Aventura", 
-                                "Sci-Fi": "Ciencia Ficción", "Comedy": "Comedia", 
-                                "Animation": "Animación", "Fantasy": "Fantasía", 
-                                "Horror": "Terror", "Thriller": "Suspenso"
-                            }
-                            
-                            if omdb_data.get('Genre'):
-                                for g_raw in omdb_data.get('Genre').split(','):
-                                    g_name = g_raw.strip()
-                                    g_final = genre_mapping.get(g_name, g_name)
-                                    
-                                    genre = Genre.query.filter(Genre.name.ilike(g_final)).first()
-                                    if not genre:
-                                        genre = Genre(name=g_final)
-                                        db.session.add(genre)
-                                    new_movie.genres.append(genre)
-                            
-                            db.session.add(new_movie)
-                            db.session.commit()
-                            movie = new_movie
-                            print(f"✅ Agregada: {title}")
-                except Exception as ex:
-                    print(f"⚠️ Error OMDb: {ex}")
+                        if r.get('Genre'):
+                            g_name = r.get('Genre').split(',')[0].strip()
+                            g_db = Genre.query.filter(Genre.name.ilike(g_name)).first()
+                            if not g_db: 
+                                g_db = Genre(name=g_name)
+                                db.session.add(g_db)
+                            movie.genres.append(g_db)
+                        
+                        db.session.add(movie)
+                        db.session.commit()
+                        print(f"✅ Importada: {title}")
+                except: pass
 
             if movie:
-                # Verificar que no fue ya vista
-                if current_user.is_authenticated and movie in current_user.seen_list:
-                    continue
-
+                if current_user.is_authenticated and movie in current_user.seen_list: continue
                 g_name = movie.genres[0].name if movie.genres else "Cine"
-                processed.append({
-                    'id': movie.id,
-                    'title': movie.title,
-                    'poster': movie.poster,
-                    'genres': [g_name],
-                    'reason': reason
+                res.append({
+                    'id': movie.id, 'title': movie.title, 
+                    'poster': movie.poster, 'genres': [g_name], 
+                    'reason': item.get('reason', 'Recomendada')
                 })
-        return processed
+        return res
 
-    # Procesar recomendaciones
-    top_picks = process_movie_list(raw_data.get('top_picks', []))
-    also_like = process_movie_list(raw_data.get('also_like', []))
+    top = process(raw_data.get('top_picks', []))
+    also = process(raw_data.get('also_like', []))
 
-    if not top_picks and not also_like:
-        return jsonify({'error': 'No hay películas nuevas. ¡Buen cinéfilo!'}), 404
+    if not top and not also:
+        return jsonify({'error': 'Sin resultados.'}), 404
 
-    return jsonify({
-        'top_picks': top_picks,
-        'also_like': also_like
-    })
-
-@ai_bp.route('/adventure')
-@login_required
-def adventure_mode():
-    """Página del modo aventura/encuesta"""
-    return render_template('ai_concierge.html')
+    return jsonify({'top_picks': top, 'also_like': also})

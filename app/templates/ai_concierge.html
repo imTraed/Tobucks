@@ -3,63 +3,94 @@
 {% block title %}Modo Aventura - Tobucks{% endblock %}
 
 {% block head %}
-<style>
-    /* --- ESTILOS GENERALES Y JUEGO --- */
-    body {
-        background: radial-gradient(ellipse at center, #141414 0%, #000000 100%);
-        overflow-x: hidden;
-    }
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
+<style>
+    /* --- ESTILOS GENERALES (FIX FONDO MÓVIL) --- */
+    html{ 
+    height: 100%; 
+    background-color: #000000 !important; /* Esto elimina lo blanco definitivamente */
+}
+body {
+    /* Aplicamos el degradado aquí */
+    background: radial-gradient(ellipse at center, #141414 0%, #000000 100%);
+    
+    /* ESTA ES LA CLAVE: El fondo no se mueve al hacer scroll */
+    background-attachment: fixed; 
+    
+    /* Aseguramos que cubra todo el espacio */
+    background-size: cover;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+    /* --- ESCRITORIO (TU DISEÑO ORIGINAL 1.HTML INTACTO) --- */
     .adventure-wrapper {
         min-height: 85vh;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         padding: 20px;
+        padding-top: 0px; /* Padding original de escritorio */
+        transition: all 0.3s ease;
+        height: 100vh;
     }
 
     /* BARRA PROGRESO */
     .progress-container {
-        width: 100%; max-width: 600px; height: 6px;
-        background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 50px;
+        width: 100%; 
+        max-width: 600px; /* Devuélvele su tamaño original */
+        height: 6px;
+        background: rgba(255,255,255,0.1); 
+        border-radius: 10px; 
+        margin-bottom: 50px;
     }
     .progress-bar-fill {
         height: 100%; background: #FFD700; width: 0%; transition: width 0.4s ease-out;
-        box-shadow: 0 0 15px #FFD700;
+        box-shadow: 0 0 15px #FFD700; border-radius: 10px;
     }
 
     /* PREGUNTAS */
-    .question-card { text-align: center; max-width: 1000px; animation: slideUp 0.5s ease-out; width: 100%; }
+    .question-card {
+    margin: 0 auto !important; /* Esto centra la caja en la pantalla */
+    width: 90% !important;
+    max-width: 350px;
+}
     
-    /* Ajuste: Quitamos el margen inferior excesivo ya que no hay contador */
     .question-text { 
-        font-size: 2.5rem; 
-        font-weight: 900; 
-        color: #fff; 
-        margin-bottom: 2.5rem; 
-        text-shadow: 0 4px 10px rgba(0,0,0,0.5); 
-        line-height: 1.2; 
+        font-size: 2.5rem; font-weight: 900; color: #fff; margin-bottom: 2.5rem; 
+        text-shadow: 0 4px 10px rgba(0,0,0,0.5); line-height: 1.2; 
     }
     .question-text span { color: #FFD700; }
 
     .options-grid {
         display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 30px;
     }
-    @media (min-width: 992px) { .options-grid.grid-4 { grid-template-columns: repeat(4, 1fr); } }
-    @media (max-width: 768px) { .options-grid { grid-template-columns: 1fr; } }
-
+    @media (min-width: 992px) { .options-grid.grid-4 { grid-template-columns: repeat(2, 1fr); } } 
+    
     .option-btn {
-        background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 25px; border-radius: 16px; color: #eee; cursor: pointer;
-        display: flex; align-items: center; gap: 20px; transition: all 0.2s;
-        backdrop-filter: blur(5px);
-        text-align: left;
-    }
+    /* 1. Altura y distribución */
+    min-height: 140px;
+    height: 100%;
+    
+    /* 2. Convertir a Flexbox Vertical */
+    display: flex;
+    flex-direction: column;  /* Icono arriba, texto abajo */
+    
+    /* 3. EL ARREGLO DEL CENTRADO */
+    justify-content: center; /* Centrar verticalmente */
+    align-items: center !important; /* Centrar horizontalmente los elementos (icono/texto) */
+    text-align: center !important;  /* Centrar el texto en sí (ESTO ES LO QUE FALTABA) */
+    
+    /* 4. Ajustes visuales */
+    padding: 15px;
+    gap: 10px;
+}
     .option-btn:hover {
         background: rgba(255, 215, 0, 0.1); border-color: #FFD700; transform: translateY(-3px);
-        color: white;
-        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.15);
+        color: white; box-shadow: 0 5px 15px rgba(255, 215, 0, 0.15);
     }
     .option-icon { font-size: 1.8rem; color: #FFD700; flex-shrink: 0; }
     .option-title { font-weight: 800; font-size: 1.1rem; display: block; margin-bottom: 4px; }
@@ -69,137 +100,153 @@
     .loader-area { display: none; text-align: center; }
     .spinner-grow { width: 4rem; height: 4rem; }
 
-    /* --- ESTILOS DE RESULTADOS (DASHBOARD) --- */
+    /* --- RESULTADOS ESCRITORIO (TU DISEÑO 1.HTML INTACTO) --- */
     #resultsBox { display: none; width: 100%; animation: fadeIn 0.8s; }
 
     .full-screen-dashboard {
         height: 80vh; 
-        display: flex;
-        gap: 30px;
-        width: 100%;
-        max-width: 1600px;
-        margin: 0 auto;
-    }
-    @media (max-width: 992px) {
-        .full-screen-dashboard { flex-direction: column; height: auto; }
+        display: flex; gap: 30px; width: 100%; max-width: 1600px; margin: 0 auto;
     }
 
     /* COLUMNA IZQUIERDA */
-    .main-results-column {
-        flex: 2;
-        display: flex;
-        flex-direction: column;
-    }
+    .main-results-column { flex: 2; display: flex; flex-direction: column; }
     
     .cards-row-stretch {
-        display: flex;
-        gap: 20px;
-        flex-grow: 1;
-        align-items: flex-start; 
-        height: 100%;
+        display: flex; gap: 20px; flex-grow: 1; align-items: flex-start; height: 100%;
     }
-    @media (max-width: 768px) { .cards-row-stretch { flex-direction: column; } }
 
     .ai-result-card {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
+        flex: 1; display: flex; flex-direction: column; height: 100%;
         background: linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%);
-        border: 1px solid rgba(255, 215, 0, 0.15);
-        border-radius: 12px;
-        overflow: hidden;
-        transition: all 0.4s;
-        text-decoration: none;
+        border: 1px solid rgba(255, 215, 0, 0.15); border-radius: 12px;
+        overflow: hidden; transition: all 0.4s; text-decoration: none;
     }
     .ai-result-card:hover {
-        border-color: #FFD700;
-        transform: translateY(-8px);
+        border-color: #FFD700; transform: translateY(-8px);
         box-shadow: 0 15px 40px rgba(0,0,0,0.6);
     }
 
-    /* PORTADAS TOP 3 */
     .top-poster-container {
-        position: relative;
-        width: 100%;
-        height: 220px; 
-        overflow: hidden;
-        background-color: #000;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        position: relative; width: 100%; height: 300px; /* Altura original escritorio */
+        overflow: hidden; background-color: #000000; border-bottom: 1px solid rgba(255,255,255,0.1);
     }
     .top-poster-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: top center;
-        opacity: 0.9;
-        transition: transform 0.5s ease, opacity 0.5s ease;
+        width: 100%; height: 100%; object-fit: cover; object-position: top center;
+        opacity: 0.9; transition: transform 0.5s ease;
     }
-    .ai-result-card:hover .top-poster-img {
-        transform: scale(1.05);
-        opacity: 1;
-    }
+    .ai-result-card:hover .top-poster-img { transform: scale(1.05); opacity: 1; }
 
     /* COLUMNA DERECHA */
     .sidebar-column {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 16px;
-        padding: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        flex: 1; display: flex; flex-direction: column;
+        background: rgba(255, 255, 255, 0.03); border-radius: 16px;
+        padding: 20px; border: 1px solid rgba(255, 255, 255, 0.05);
         min-width: 320px;
     }
 
     .mentions-scroll-area {
-        flex-grow: 1;
-        overflow-y: auto;
-        padding-right: 10px;
-        margin-bottom: 20px;
+        flex-grow: 1; overflow-y: auto; padding-right: 10px; margin-bottom: 20px;
     }
     .mentions-scroll-area::-webkit-scrollbar { width: 5px; }
-    .mentions-scroll-area::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
     .mentions-scroll-area::-webkit-scrollbar-thumb { background: #FFD700; border-radius: 10px; }
 
     .mention-card-small {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: rgba(0,0,0,0.3);
-        padding: 10px;
-        border-radius: 10px;
-        border: 1px solid rgba(255,255,255,0.05);
-        text-decoration: none;
-        transition: all 0.2s;
-        margin-bottom: 10px;
+        display: flex; align-items: center; gap: 12px;
+        background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.05); text-decoration: none;
+        transition: all 0.2s; margin-bottom: 10px;
     }
     .mention-card-small:hover {
-        background: rgba(255,215,0,0.1);
-        border-color: rgba(255,215,0,0.3);
-        transform: translateX(5px);
+        background: rgba(255,215,0,0.1); border-color: rgba(255,215,0,0.3); transform: translateX(5px);
     }
     .mention-poster-small { width: 50px; height: 75px; object-fit: cover; border-radius: 6px; }
-    .mention-placeholder-small { width: 50px; height: 75px; background: #222; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #555; }
+    .mention-placeholder-small { width: 50px; height: 75px; background: #222; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
 
     .btn-mega-cta {
         width: 100%; padding: 15px;
         font-size: 1.1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #FFD700 0%, #FFC700 100%);
+        border-radius: 12px; background: linear-gradient(135deg, #FFD700 0%, #FFC700 100%);
         color: #000; border: none; cursor: pointer;
-        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
-        animation: pulse-gold 2s infinite;
+        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3); animation: pulse-gold 2s infinite;
         display: flex; align-items: center; justify-content: center; gap: 10px;
     }
     .btn-mega-cta:hover { transform: scale(1.03); box-shadow: 0 15px 50px rgba(255, 215, 0, 0.5); color: #000; }
 
-    @keyframes pulse-gold {
-        0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
-        70% { box-shadow: 0 0 0 15px rgba(255, 215, 0, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+    /* =========================================================
+    MÓVIL ADAPTADO: EL GRID 1 GRANDE + 2 PEQUEÑOS
+       ========================================================= */
+    @media (max-width: 991px) {
+        html, body { overflow-y: auto; height: auto; }
+        
+.adventure-wrapper { 
+            padding-top: 20px; 
+            padding-bottom: 150px; 
+            display: block; 
+            height: auto !important; 
+            justify-content: center; /* Quita el centrado vertical forzado */
+        }
+
+        .question-text { font-size: 1.8rem; margin-bottom: 1.5rem; margin-top: 30px; }
+        .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 columnas */
+    gap: 15px;
+    align-items: stretch; /* ESTO ES CLAVE: Estira las cajas para que sean iguales */
+}
+
+        .full-screen-dashboard {
+            flex-direction: column; height: auto; gap: 40px;
+        }
+
+        .main-results-column, .sidebar-column { width: 100%; height: auto; flex: none; }
+
+        /* --- GRID MÁGICO PARA EL TOP 3 EN MÓVIL --- */
+        .cards-row-stretch {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 Columnas */
+            gap: 15px;
+        }
+
+        /* TARJETA #1: Ocupa todo el ancho (span 2) */
+        .ai-result-card:nth-child(1) {
+            grid-column: 1 / -1; 
+            min-height: 400px; /* Bastante alta */
+        }
+        .ai-result-card:nth-child(1) .top-poster-container {
+            height: 250px; /* Poster grande */
+        }
+
+        /* TARJETAS #2 y #3: Una al lado de la otra */
+        .ai-result-card:nth-child(2), 
+        .ai-result-card:nth-child(3) {
+            grid-column: span 1;
+            min-height: 280px; /* Más bajitas */
+        }
+        /* Ajustar imagen y texto para las tarjetas pequeñas */
+        .ai-result-card:nth-child(2) .top-poster-container, 
+        .ai-result-card:nth-child(3) .top-poster-container {
+            height: 140px; 
+        }
+        .ai-result-card:nth-child(2) h4, .ai-result-card:nth-child(3) h4 {
+            font-size: 0.9rem !important; /* Título más chico */
+        }
+        .ai-result-card:nth-child(2) p, .ai-result-card:nth-child(3) p {
+            display: none; /* Ocultar sinopsis en las pequeñas para que se vea limpio */
+        }
+        .ai-result-card:nth-child(2) .btn, .ai-result-card:nth-child(3) .btn {
+            padding: 5px; font-size: 0.8rem; margin-top: auto;
+        }
+
+        /* --- SINOPSIS GRIS --- */
+        .card-text { color: #b0b0b0 !important; font-size: 0.85rem; }
+
+        /* Lista lateral limpia */
+        .sidebar-column { background: transparent; border: none; padding: 0; margin-top: 20px; }
+        .mentions-scroll-area { overflow: visible; max-height: none; }
     }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+
+    @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 215, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
 {% endblock %}
@@ -256,121 +303,146 @@
 </div>
 
 <script>
-    // --- SCRIPT ACTUALIZADO SIN CONTADORES Y CON TIEMPO ---
-    const script = [
-        {
-            // PREGUNTA 1: TIEMPO (NUEVA PRIORIDAD)
-            text: "¿De cuánto <span>tiempo</span> dispones hoy?",
-            options: [
-                { title: "Algo Rápido", desc: "Menos de 90 minutos (Flash).", icon: "bi-stopwatch", val: "duración: corta (menos de 90 min)" },
-                { title: "Estándar", desc: "Unas 2 horas (Lo normal).", icon: "bi-clock", val: "duración: estándar (alrededor de 2h)" },
-                { title: "Épico", desc: "Más de 2.5 horas (Sin prisa).", icon: "bi-hourglass-split", val: "duración: larga/épica" },
-                { title: "Tengo todo el día", desc: "Maratón o lo que sea.", icon: "bi-infinity", val: "duración: indiferente" }
-            ]
-        },
-        {
-            // PREGUNTA 2: ENERGÍA
-            text: "¿Cómo está tu <span>nivel de energía</span>?",
-            options: [
-                { title: "Batería Baja", desc: "Quiero algo suave, reconfortante, 'feel-good'.", icon: "bi-cup-hot", val: "energía: baja/relax" },
-                { title: "Modo Fiesta", desc: "Quiero reírme, ruido, algo divertido.", icon: "bi-emoji-sunglasses", val: "energía: alta/diversión" },
-                { title: "Intenso", desc: "Quiero tensión, adrenalina o miedo.", icon: "bi-lightning-charge", val: "energía: intensa/adrenalina" },
-                { title: "Curioso", desc: "Quiero que me vuelen la cabeza o aprender algo.", icon: "bi-lightbulb", val: "energía: curiosa/intelectual" }
-            ]
-        },
-        {
-            // PREGUNTA 3: COMPLEJIDAD
-            text: "¿Cuánto quieres <span>pensar</span> durante la película?",
-            options: [
-                { title: "Cero", desc: "Entretenimiento puro, apagar el cerebro.", icon: "bi-tv", val: "complejidad: baja/entretenimiento puro" },
-                { title: "Lo Normal", desc: "Una buena historia pero fácil de seguir.", icon: "bi-book", val: "complejidad: media/narrativa estándar" },
-                { title: "Reto Mental", desc: "Tramas complejas, giros, misterios.", icon: "bi-puzzle", val: "complejidad: alta/thriller psicológico" },
-                { title: "Filosófico", desc: "Cine de arte, lento, profundo.", icon: "bi-chat-quote", val: "complejidad: muy alta/cine de arte" }
-            ]
-        },
-        {
-            // PREGUNTA 4: ESCENARIO
-            text: "Elige el <span>escenario</span> ideal para hoy:",
-            options: [
-                { title: "Mundo Real", desc: "Drama humano, crimen urbano, historia real.", icon: "bi-building", val: "escenario: realista/urbano" },
-                { title: "Fantasía/Magia", desc: "Dragones, espadas, mundos imposibles.", icon: "bi-magic", val: "escenario: fantasía épica" },
-                { title: "Futuro/Espacio", desc: "Naves, robots, distopías tecnológicas.", icon: "bi-rocket", val: "escenario: ciencia ficción/futuro" },
-                { title: "Pasado/Época", desc: "Vestidos antiguos, guerras, nostalgia.", icon: "bi-compass", val: "escenario: histórico/época" }
-            ]
-        },
-        {
-            // PREGUNTA 5: PROTAGONISTA
-            text: "¿Qué tipo de <span>protagonista</span> quieres seguir?",
-            options: [
-                { title: "El Héroe", desc: "Noble, valiente, el clásico 'chico bueno'.", icon: "bi-shield-check", val: "protagonista: héroe clásico" },
-                { title: "El Antihéroe", desc: "Moralmente gris, cínico, rompe las reglas.", icon: "bi-incognito", val: "protagonista: antihéroe" },
-                { title: "El Perdedor", desc: "Alguien común enfrentando algo enorme.", icon: "bi-person-walking", val: "protagonista: underdog/persona común" },
-                { title: "El Villano", desc: "Una historia desde la perspectiva del malo.", icon: "bi-emoji-angry", val: "protagonista: villano/perspectiva oscura" }
-            ]
-        },
-        {
-            // PREGUNTA 6: ÉPOCA
-            text: "¿Qué década te llama la atención?",
-            options: [
-                { title: "Lo Nuevo", desc: "Cine moderno (2010 - Actualidad).", icon: "bi-phone", val: "época: contemporánea/moderna" },
-                { title: "Nostalgia 90s/00s", desc: "La era dorada del DVD y Blockbuster.", icon: "bi-disc", val: "época: 1990-2010" },
-                { title: "Clásicos 80s", desc: "Cine de culto, neón y sintetizadores.", icon: "bi-boombox", val: "época: años 80" },
-                { title: "Sin Tiempo", desc: "Me da igual el año si es buena.", icon: "bi-calendar-check", val: "época: cualquiera (calidad atemporal)" }
-            ]
-        },
-        {
-            // PREGUNTA 7: FINAL
-            text: "¿Qué sensación quieres al <span>final</span>?",
-            options: [
-                { title: "Esperanza", desc: "Un final feliz que te deje sonriendo.", icon: "bi-heart-fill", val: "final: feliz/esperanzador" },
-                { title: "Shock", desc: "Un giro de tuerca que no veas venir.", icon: "bi-exclamation-triangle", val: "final: plot twist/sorpresivo" },
-                { title: "Melancolía", desc: "Un final agridulce o trágico para llorar.", icon: "bi-cloud-rain", val: "final: triste/emotivo" },
-                { title: "Ambigüedad", desc: "Un final abierto para quedarte pensando.", icon: "bi-question-circle", val: "final: abierto/ambiguo" }
-            ]
-        }
-    ];
+    // --- LÓGICA DE RAMIFICACIÓN ---
+    const initialQuestion = {
+        text: "¿Cuál es el <span>plan de hoy</span>?",
+        options: [
+            { title: "Solo/a", desc: "Tiempo para mí", icon: "bi-person-fill", val: "solo" },
+            { title: "En Pareja", desc: "Cita o relax", icon: "bi-heart-fill", val: "pareja" },
+            { title: "Con Amigos", desc: "Risas y grupo", icon: "bi-people-fill", val: "amigos" },
+            { title: "En Familia", desc: "Niños y adultos", icon: "bi-house-heart-fill", val: "familia" }
+        ]
+    };
 
-    let step = 0, story = [];
+    const flows = {
+        'solo': [
+            { text: "¿Cuánto <span>tiempo</span> tienes?", options: [ { title: "Rápido", desc: "Menos de 90 min", icon: "bi-stopwatch", val: "duración: corta" }, { title: "Estándar", desc: "Unas 2 horas", icon: "bi-clock", val: "duración: normal" }, { title: "Largo", desc: "Más de 2.5 horas", icon: "bi-hourglass-split", val: "duración: larga" }, { title: "Maratón", desc: "Toda la tarde", icon: "bi-collection-play", val: "duración: maratón" } ]},
+            { text: "¿Cómo está tu <span>ánimo</span>?", options: [ { title: "Curioso", desc: "Quiero aprender", icon: "bi-lightbulb", val: "ánimo: intelectual" }, { title: "Cansado", desc: "Algo suave", icon: "bi-cup-hot", val: "ánimo: confort" }, { title: "Melancólico", desc: "Para llorar", icon: "bi-cloud-rain", val: "ánimo: drama" }, { title: "Energético", desc: "Sorpréndeme", icon: "bi-lightning", val: "ánimo: acción" } ]},
+            { text: "¿Nivel de <span>complejidad</span>?", options: [ { title: "Simple", desc: "Solo disfrutar", icon: "bi-tv", val: "complejidad: baja" }, { title: "Interesante", desc: "Buena historia", icon: "bi-journal-text", val: "complejidad: media" }, { title: "Reto Mental", desc: "Para pensar mucho", icon: "bi-puzzle", val: "complejidad: alta" }, { title: "Hechos Reales", desc: "Documental", icon: "bi-camera-reels", val: "complejidad: real" } ]},
+            { text: "¿Qué te apetece <span>ver</span>?", options: [ { title: "Mundo Real", desc: "Drama o Crimen", icon: "bi-building", val: "género: realismo" }, { title: "Fantasía", desc: "Magia y Dragones", icon: "bi-magic", val: "género: fantasía" }, { title: "Miedo", desc: "Sustos fuertes", icon: "bi-emoji-astonished", val: "género: terror" }, { title: "Ciencia Ficción", desc: "Espacio y Futuro", icon: "bi-rocket", val: "género: sci-fi" } ]},
+            { text: "¿Época preferida?", options: [ { title: "Lo Nuevo", desc: "Últimos años", icon: "bi-phone", val: "época: moderna" }, { title: "Clásicos", desc: "Cine de oro", icon: "bi-award", val: "época: clásica" }, { title: "Retro", desc: "Años 80 y 90", icon: "bi-boombox", val: "época: retro" }, { title: "Da igual", desc: "Si es buena vale", icon: "bi-calendar", val: "época: cualquiera" } ]},
+            { text: "¿Tipo de final?", options: [ { title: "Feliz", desc: "Sonriendo", icon: "bi-emoji-smile", val: "final: feliz" }, { title: "Triste", desc: "Impactante", icon: "bi-emoji-frown", val: "final: triste" }, { title: "Abierto", desc: "Para pensar", icon: "bi-question-circle", val: "final: abierto" }, { title: "Sorpresa", desc: "Giro inesperado", icon: "bi-exclamation-triangle", val: "final: sorpresa" } ]}
+        ],
+        'pareja': [
+            { text: "¿Cuánto <span>tiempo</span> tienen?", options: [ { title: "Rápido", desc: "Menos de 90 min", icon: "bi-stopwatch", val: "duración: corta" }, { title: "Estándar", desc: "Unas 2 horas", icon: "bi-clock", val: "duración: normal" }, { title: "Maratón", desc: "Sin prisa", icon: "bi-infinity", val: "duración: larga" }, { title: "Miniserie", desc: "Varios capítulos", icon: "bi-layers", val: "duración: miniserie" } ]},
+            { text: "¿Qué ambiente buscan?", options: [ { title: "Romántico", desc: "Amor y parejas", icon: "bi-heart-fill", val: "vibe: romántico" }, { title: "Relajado", desc: "Para tener de fondo", icon: "bi-volume-down", val: "vibe: ligero" }, { title: "Intriga", desc: "Resolver misterio", icon: "bi-eye", val: "vibe: thriller" }, { title: "Risas", desc: "Divertirse", icon: "bi-emoji-laughing", val: "vibe: comedia" } ]},
+            { text: "¿Quién <span>elige</span> hoy?", options: [ { title: "Los dos", desc: "Decisión mutua", icon: "bi-people", val: "elección: equilibrada" }, { title: "Sorpresa", desc: "Algo único", icon: "bi-gift", val: "elección: joya oculta" }, { title: "Ligero", desc: "Fácil de ver", icon: "bi-feather", val: "elección: fácil" }, { title: "Turno", desc: "Elige el otro", icon: "bi-arrow-left-right", val: "elección: variada" } ]},
+            { text: "¿Qué tan <span>intensa</span>?", options: [ { title: "Drama", desc: "Historia seria", icon: "bi-droplet", val: "intensidad: drama" }, { title: "Acción", desc: "Explosiones", icon: "bi-fire", val: "intensidad: acción" }, { title: "Terror", desc: "Miedo real", icon: "bi-emoji-astonished", val: "intensidad: terror" }, { title: "Misterio", desc: "Crimen/Policial", icon: "bi-search", val: "intensidad: crimen" } ]},
+            { text: "¿Dónde ocurre?", options: [ { title: "Actualidad", desc: "Hoy en día", icon: "bi-geo-alt", val: "setting: actual" }, { title: "Fantasía", desc: "Mundos mágicos", icon: "bi-stars", val: "setting: fantasía" }, { title: "Futuro", desc: "Tecnología", icon: "bi-cpu", val: "setting: futuro" }, { title: "Época", desc: "Historia antigua", icon: "bi-hourglass", val: "setting: época" } ]},
+            { text: "¿Final deseado?", options: [ { title: "Alegre", desc: "Sentirse bien", icon: "bi-sun", val: "final: feliz" }, { title: "Debate", desc: "Para conversar", icon: "bi-chat-dots", val: "final: conversación" }, { title: "Emotivo", desc: "Llorar un poco", icon: "bi-heartbreak", val: "final: llorar" }, { title: "Impactante", desc: "Quedar en shock", icon: "bi-lightning-fill", val: "final: shock" } ]}
+        ],
+        'amigos': [
+            { text: "¿Cuánto <span>tiempo</span> hay?", options: [ { title: "Corto", desc: "Menos de 90 min", icon: "bi-stopwatch", val: "duración: corta" }, { title: "Normal", desc: "Unas 2 horas", icon: "bi-clock", val: "duración: normal" }, { title: "Saga", desc: "Varias pelis", icon: "bi-film", val: "duración: épica" }, { title: "Toda la noche", desc: "Maratón", icon: "bi-moon-stars", val: "duración: maratón" } ]},
+            { text: "¿Qué busca el <span>grupo</span>?", options: [ { title: "Pasar Miedo", desc: "Terror", icon: "bi-emoji-dizzy", val: "vibe: terror" }, { title: "Acción Pura", desc: "Adrenalina", icon: "bi-speedometer2", val: "vibe: acción" }, { title: "Risas", desc: "Comedia loca", icon: "bi-emoji-laughing-fill", val: "vibe: comedia" }, { title: "Locura", desc: "Misterio raro", icon: "bi-hurricane", val: "vibe: thriller psicológico" } ]},
+            { text: "¿Nivel de <span>atención</span>?", options: [ { title: "Total", desc: "Todos atentos", icon: "bi-eye-fill", val: "atención: alta" }, { title: "Baja", desc: "Ruido/Fiesta", icon: "bi-music-note-beamed", val: "atención: baja" }, { title: "Media", desc: "Para comentar", icon: "bi-chat-quote", val: "atención: media" }, { title: "Juego", desc: "Interactiva", icon: "bi-controller", val: "atención: interactiva" } ]},
+            { text: "¿Estilo?", options: [ { title: "Éxito Mundial", desc: "Muy famosa", icon: "bi-ticket-perforated", val: "estilo: presupuesto alto" }, { title: "Alternativa", desc: "Cine Indie", icon: "bi-camera-video", val: "estilo: culto" }, { title: "Rara", desc: "Bizarra/Única", icon: "bi-bug", val: "estilo: raro" }, { title: "Clásico", desc: "Imperdible", icon: "bi-trophy", val: "estilo: clásico" } ]},
+            { text: "¿Época?", options: [ { title: "Actual", desc: "Hoy", icon: "bi-calendar-check", val: "época: hoy" }, { title: "Nostalgia", desc: "Años 2000", icon: "bi-disc", val: "época: 2000s" }, { title: "Retro", desc: "Años 80", icon: "bi-cassette", val: "época: 80s" }, { title: "Acción 90s", desc: "Clásicos acción", icon: "bi-boombox", val: "época: 90s" } ]},
+            { text: "¿Final?", options: [ { title: "Giro Sorpresa", desc: "Nadie lo espera", icon: "bi-shuffle", val: "final: giro" }, { title: "Épico", desc: "Increíble", icon: "bi-star-fill", val: "final: espectacular" }, { title: "Risas", desc: "Divertido", icon: "bi-emoji-smile-upside-down", val: "final: divertido" }, { title: "Debate", desc: "Final abierto", icon: "bi-question-lg", val: "final: abierto" } ]}
+        ],
+        'familia': [
+            { text: "¿Tiempo disponible?", options: [ { title: "Corto", desc: "Menos de 90 min", icon: "bi-stopwatch", val: "duración: corta" }, { title: "Normal", desc: "Unas 2 horas", icon: "bi-clock", val: "duración: normal" }, { title: "Tarde de Cine", desc: "Largo", icon: "bi-brightness-high", val: "duración: larga" }, { title: "Serie", desc: "Capítulos", icon: "bi-collection", val: "duración: serie" } ]},
+            { text: "¿Quiénes <span>ven</span>?", options: [ { title: "Niños", desc: "Infantil", icon: "bi-emoji-smile", val: "audiencia: infantil" }, { title: "Adolescentes", desc: "Jóvenes", icon: "bi-headphones", val: "audiencia: teens" }, { title: "Abuelos", desc: "Clásica", icon: "bi-eyeglasses", val: "audiencia: clásica" }, { title: "Mix", desc: "Toda la familia", icon: "bi-people", val: "audiencia: todos" } ]},
+            { text: "¿Tipo de peli?", options: [ { title: "Dibujos", desc: "Animada", icon: "bi-palette", val: "tipo: animación" }, { title: "Personas", desc: "Actores reales", icon: "bi-person-video", val: "tipo: live action" }, { title: "Aventura", desc: "Viajes", icon: "bi-map", val: "tipo: aventura" }, { title: "Musical", desc: "Canciones", icon: "bi-music-note-beamed", val: "tipo: musical" } ]},
+            { text: "¿Tono?", options: [ { title: "Risas", desc: "Divertida", icon: "bi-emoji-laughing", val: "tono: comedia" }, { title: "Mensaje", desc: "Inspiradora", icon: "bi-heart", val: "tono: inspirador" }, { title: "Aprender", desc: "Educativa", icon: "bi-book", val: "tono: documental" }, { title: "Mágico", desc: "Fantasía", icon: "bi-stars", val: "tono: mágico" } ]},
+            { text: "¿Nivel de susto?", options: [ { title: "Cero", desc: "Nada de miedo", icon: "bi-shield-check", val: "miedo: nulo" }, { title: "Poquito", desc: "Susto ligero", icon: "bi-emoji-astonished", val: "miedo: bajo" }, { title: "Suspenso", desc: "Intriga", icon: "bi-eye", val: "miedo: medio" }, { title: "Acción", desc: "Peleas", icon: "bi-lightning", val: "miedo: aventura" } ]},
+            { text: "¿Preferencia?", options: [ { title: "Disney", desc: "Pixar/Disney", icon: "bi-stars", val: "estilo: disney" }, { title: "Clásico", desc: "Familia 90s", icon: "bi-film", val: "estilo: 90s family" }, { title: "Nuevo", desc: "Moderno", icon: "bi-newspaper", val: "estilo: moderno" }, { title: "Japón", desc: "Anime/Ghibli", icon: "bi-flower3", val: "estilo: anime" } ]}
+        ]
+    };
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const savedResults = sessionStorage.getItem('tobucks_ai_results');
-        if (savedResults) {
-            try {
-                const data = JSON.parse(savedResults);
-                document.getElementById('gameBox').style.display = 'none';
-                document.getElementById('progressBox').style.display = 'none';
-                renderResults(data);
-            } catch (e) {
-                renderStep(0);
-            }
+    let currentFlow = [];
+    let step = -1; 
+    let story = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+    const savedResults = sessionStorage.getItem('tobucks_ai_results');
+    if (savedResults) {
+        document.getElementById('gameBox').style.display = 'none';
+        document.getElementById('progressBox').style.display = 'none';
+        renderResults(JSON.parse(savedResults));
+    } else {
+        renderInitial(); // <--- CORRECCIÓN: Usa la función correcta
+    }
+});
+
+function renderInitial() {
+    step = -1;
+    story = []; 
+    
+    // 1. APAGAMOS los resultados y el cargador
+    document.getElementById('resultsBox').style.display = 'none'; 
+    document.getElementById('loaderBox').style.display = 'none'; 
+    
+    // 2. ENCENDEMOS el juego y la barra de progreso
+    document.getElementById('gameBox').style.display = 'block'; 
+    document.getElementById('progressBox').style.display = 'block'; 
+
+    // 3. Forzamos la opacidad (por si el fade-out la dejó en 0)
+    document.getElementById('gameBox').style.opacity = 1;
+
+    renderQuestion(initialQuestion);
+    updateProgress(0);
+}
+
+    function startFlow(flowKey) {
+        currentFlow = flows[flowKey];
+        story.push(`Contexto: ${flowKey}`);
+        step = 0;
+        renderQuestion(currentFlow[step]);
+        updateProgress(1);
+    }
+
+    function nextStep(val, isInitial = false) {
+        story.push(val);
+        if (isInitial) {
+            startFlow(val);
         } else {
-            renderStep(0);
+            step++;
+            if (step < currentFlow.length) {
+                renderQuestion(currentFlow[step]);
+                updateProgress(step + 1);
+            } else {
+                finishGame();
+            }
         }
-    });
+    }
 
-    function renderStep(idx) {
+    function renderQuestion(data) {
         const box = document.getElementById('gameBox');
-        const data = script[idx];
-        document.getElementById('progressBar').style.width = `${((idx)/script.length)*100}%`;
-
-        // Renderizado SIN el texto "Pregunta X/7"
-        let html = `<div class="question-text">${data.text}</div><div class="options-grid grid-4">`;
+        let html = `<div class="question-text">${data.text}</div><div class="options-grid">`;
         data.options.forEach(opt => {
+            const onClickFn = step === -1 ? `nextStep('${opt.val}', true)` : `nextStep('${opt.val}')`;
             html += `
-                <div class="option-btn" onclick="nextStep('${opt.val}')">
+                <div class="option-btn" onclick="${onClickFn}">
                     <i class="bi ${opt.icon} option-icon"></i>
-                    <div><span class="option-title">${opt.title}</span><span class="option-desc">${opt.desc}</span></div>
+                    <div>
+                        <span class="option-title">${opt.title}</span>
+                        <span class="option-desc">${opt.desc}</span>
+                    </div>
                 </div>`;
         });
         html += `</div>`;
         box.innerHTML = html;
+        box.style.opacity = 0;
+        setTimeout(() => box.style.opacity = 1, 50);
     }
 
-    function nextStep(val) {
-        story.push(val);
-        step++;
-        step < script.length ? renderStep(step) : finishGame();
-    }
+    function updateProgress(s) {
+    // Si pasamos un número manual (como 0), úsalo. Si no, usa la variable global 'step'.
+    const actualStep = (typeof currentStepOverride === 'number') ? currentStepOverride : step;
+    
+    // Total de pasos en el flujo actual (o 5 por defecto si aún no empieza)
+    const total = (currentFlow && currentFlow.length > 0) ? currentFlow.length : 5; 
+    
+    // Cálculo simple: (Paso actual + 1) / Total * 100
+    // Sumamos 1 porque 'step' empieza en 0 (array index), pero visualmente es la pregunta 1.
+    let pct = ((actualStep + 1) / total) * 100;
+    
+    // Límites de seguridad (0% a 100%)
+    if (actualStep === -1) pct = 5; // Inicio (poquito de barra)
+    if (pct > 100) pct = 100;
+
+    document.getElementById('progressBar').style.width = `${pct}%`;
+}
 
     async function finishGame() {
         document.getElementById('gameBox').style.display = 'none';
@@ -384,8 +456,8 @@
                 body: JSON.stringify({ narrative: story.join(". ") })
             });
             const data = await res.json();
-            document.getElementById('loaderBox').style.display = 'none';
             
+            document.getElementById('loaderBox').style.display = 'none';
             if (data.error) { 
                 alert(data.error); 
                 location.reload(); 
@@ -393,16 +465,21 @@
                 sessionStorage.setItem('tobucks_ai_results', JSON.stringify(data));
                 renderResults(data); 
             }
-        } catch (e) { alert("Error de conexión con el servidor IA."); }
+        } catch { alert("Error de conexión"); location.reload(); }
     }
 
-    function resetGame() {
-        sessionStorage.removeItem('tobucks_ai_results');
-        location.reload();
-    }
+function resetGame() {
+    // 1. Borramos los resultados de la IA de la sesión
+    sessionStorage.removeItem('tobucks_ai_results');
+    
+    // 2. En lugar de recargar toda la web, reiniciamos la vista
+    renderInitial(); 
+}
 
+    // --- RENDERIZADO VISUAL ---
     function renderResults(data) {
         document.getElementById('resultsBox').style.display = 'block';
+        
         const topContainer = document.getElementById('topPicksRow');
         const mentionsContainer = document.getElementById('mentionsList');
         
@@ -411,6 +488,7 @@
         const tops = data.top_picks || [];
         
         tops.forEach((movie, index) => {
+            const rank = index + 1;
             const posterSrc = movie.poster ? `{{ url_for('static', filename='') }}${movie.poster}` : null;
             const imgContent = posterSrc 
                 ? `<img src="${posterSrc}" class="top-poster-img" alt="${movie.title}">`
@@ -420,7 +498,7 @@
                 <div class="top-poster-container">
                     ${imgContent}
                     <div class="position-absolute top-0 start-0 p-3" style="z-index: 2;">
-                        <span class="badge bg-warning text-dark fw-bold fs-6 shadow-sm">#${index + 1} TOP</span>
+                        <span class="badge bg-warning text-dark fw-bold fs-6 shadow-sm">#${rank} TOP</span>
                     </div>
                 </div>`;
             
@@ -431,12 +509,12 @@
             htmlTop += `
             <a href="${link}" class="ai-result-card">
                 ${posterContainer}
-                <div class="card-body text-white d-flex flex-column p-4">
-                    <h4 class="card-title fw-bolder mb-2" style="color: #FFD700; font-size: 1.1rem; line-height: 1.3;">${movie.title}</h4>
+                <div class="card-body-custom">
+                    <h4 class="fw-bolder mb-2" style="color: #FFD700; font-size: 1.1rem; line-height: 1.3;">${movie.title}</h4>
                     <div class="mb-3">
                         ${movie.genres.map(g => `<span class="badge bg-dark border border-secondary text-white-50 me-1 mb-1" style="font-size:0.65rem;">${g}</span>`).join('')}
                     </div>
-                    <p class="card-text fst-italic opacity-75 mb-3 flex-grow-1" style="font-size: 0.85rem; line-height: 1.5;">
+                    <p class="card-text opacity-75 mb-3 flex-grow-1" style="font-size: 0.85rem; line-height: 1.5; color: #b0b0b0;">
                         <i class="bi bi-quote fs-5 text-warning me-1 opacity-50"></i>
                         ${movie.reason}
                     </p>
@@ -448,7 +526,7 @@
         });
         topContainer.innerHTML = htmlTop;
 
-        // 2. MENCIONES
+        // 2. MENCIONES (LISTA LATERAL)
         let htmlMentions = '';
         const extras = data.also_like || [];
         

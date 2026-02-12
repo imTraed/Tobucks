@@ -1,10 +1,15 @@
-"""Inicialización de la aplicación Flask"""
-
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
+from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from config import Config
+from dotenv import load_dotenv
+
+# Cargar las variables del archivo .env
+load_dotenv()
 
 # Extensiones globales
 db = SQLAlchemy()
@@ -12,41 +17,81 @@ migrate = Migrate()
 login_manager = LoginManager()
 
 def create_app(config_class=Config):
-    """Crear y configurar la aplicación Flask"""
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # Configuración de APIs
-    app.config['GOOGLE_API_KEY'] = 'AIzaSyB8N--E-B7yFzPLAgu0AQ3zL3Mv2Ae7Wbs'
-    app.config['OMDB_API_KEY'] = 'c4a84505'
+    # --- CONFIGURACIÓN DE BASE DE DATOS ---
+    database_url = os.getenv('DATABASE_URL')
 
-    # Inicializar extensiones
+    if database_url:
+        # --- MODO NUBE (Render) ---
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+        print("✅ MODO NUBE: Conectado a PostgreSQL")
+    else:
+        # --- MODO LOCAL (PC) ---
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        project_root = os.path.dirname(basedir)
+        
+        instance_db = os.path.join(project_root, 'instance', 'bus_station.db')
+        root_db = os.path.join(project_root, 'bus_station.db')
+        default_db = os.path.join(project_root, 'db.sqlite3')
+
+        if os.path.exists(instance_db):
+            app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{instance_db}'
+            print(f"📂 MODO LOCAL: Usando base de datos en INSTANCE")
+        elif os.path.exists(root_db):
+            app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{root_db}'
+            print(f"📂 MODO LOCAL: Usando base de datos en RAÍZ")
+        else:
+            app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{default_db}'
+            print(f"⚠️ MODO LOCAL: Usando nueva base de datos: {default_db}")
+
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # --- CLAVES SECRETAS (Protegidas) ---
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'desarrollo-key-segura')
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'jwt-desarrollo-key')
+    
+    # --- APIs EXTERNAS (Sin claves hardcodeadas) ---
+    app.config['GROQ_API_KEY'] = os.getenv('GROQ_API_KEY')
+    app.config['OMDB_API_KEY'] = os.getenv('OMDB_API_KEY')
+
+    # --- INICIALIZAR EXTENSIONES ---
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     login_manager.login_view = "users.login"
+    
+    CORS(app)
+    JWTManager(app)
 
-    # Cargar usuario desde sesión
+    # Cargar usuario
     from .models.models import User
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
+    # --- REGISTRO DE BLUEPRINTS ---
+    from .routes.main import main_bp
+    from .routes.users import users_bp
+    from .routes.movies import movies_bp
+    from .routes.recommendations import recommendations_bp
+    from .routes.ai_concierge import ai_bp
+    from .routes.api import api_bp
+    from .routes.preferences import preferences_bp 
+    
+    app.register_blueprint(preferences_bp)
+    app.register_blueprint(main_bp)
+    app.register_blueprint(users_bp)
+    app.register_blueprint(movies_bp)
+    app.register_blueprint(recommendations_bp)
+    app.register_blueprint(ai_bp)
+    app.register_blueprint(api_bp)
+
+    # Crear tablas si no existen
     with app.app_context():
-        # Crear tablas de base de datos
         db.create_all()
-
-        # Importar y registrar blueprints (rutas)
-        from .routes.main import main_bp
-        from .routes.users import users_bp
-        from .routes.movies import movies_bp
-        from .routes.recommendations import recommendations_bp
-        from .routes.ai_concierge import ai_bp
-
-        app.register_blueprint(main_bp)
-        app.register_blueprint(users_bp)
-        app.register_blueprint(movies_bp)
-        app.register_blueprint(recommendations_bp)
-        app.register_blueprint(ai_bp)
 
     return app

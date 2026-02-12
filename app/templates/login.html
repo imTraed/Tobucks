@@ -4,214 +4,198 @@
 
 {% block head %}
 <style>
-    /* --- FONDO CINEMÁTICO --- */
+    /* --- FONDO GLOBAL (Evita bordes blancos) --- */
+    html {
+        background-color: #000000;
+        height: 100%;
+    }
+
     body {
-        background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
-        height: 100vh;
-        overflow: hidden; /* Evita scroll en login */
+        background-color: #000000;
+        margin: 0;
+        /* Permitimos scroll solo si la pantalla es MUY pequeña (ej. móviles antiguos en horizontal) */
+        /* de lo contrario, hidden evita el rebote */
+        overflow-x: hidden; 
     }
 
-    /* --- CONTENEDOR CENTRAL --- */
-    .login-wrapper {
-        height: 100vh; /* Ocupa toda la pantalla - altura del nav */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        padding: 20px;
-    }
-
-    /* Fondo de luces animadas (Opcional, para dar vida) */
-    .ambient-light {
-        position: absolute;
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-        animation: pulse 5s infinite ease-in-out;
-    }
-
-    /* --- TARJETA DE CRISTAL (GLASSMORPHISM) --- */
-    .login-card {
+    /* --- CONTENEDOR CENTRAL INTELIGENTE --- */
+    .auth-container {
+        /* MAGIA AQUÍ: 
+           Altura = 100% de la pantalla - 70px (espacio aprox de la Navbar).
+           Esto centra el login en el espacio SOBRANTE sin generar scroll. */
+        min-height: calc(100dvh - 76px); 
         width: 100%;
-        max-width: 420px;
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        padding: 40px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        position: relative;
-        z-index: 10;
-        animation: slideUp 0.6s ease-out;
+        display: flex;
+        align-items: center;     /* Centrado Vertical */
+        justify-content: center; /* Centrado Horizontal */
+        
+        /* Degradado suave que se funde con la navbar de arriba */
+        background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+        padding: 20px;
+        box-sizing: border-box;
     }
 
-    /* --- TIPOGRAFÍA --- */
-    .login-brand {
-        font-family: 'Impact', sans-serif; /* O tu fuente de logo */
-        font-size: 2.5rem;
+    /* --- TARJETA LOGIN --- */
+    .auth-card {
+        width: 100%;
+        max-width: 380px;
+        background: rgba(20, 20, 20, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        padding: 35px 25px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        backdrop-filter: blur(15px);
+        animation: zoomIn 0.4s ease-out;
+    }
+
+    .brand-title {
+        font-size: 2.2rem;
+        font-weight: 900;
         color: #FFD700;
-        text-align: center;
         margin-bottom: 5px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
+        letter-spacing: -1px;
+        text-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
     }
 
-    .login-subtitle {
-        color: rgba(255, 255, 255, 0.6);
-        text-align: center;
+    .brand-subtitle {
+        color: #888;
         font-size: 0.9rem;
         margin-bottom: 30px;
-        font-weight: 300;
     }
-
-    /* --- ALERTAS PERSONALIZADAS (ELIMINANDO EL POPUP FEO) --- */
-    .custom-alert {
-        background: rgba(255, 215, 0, 0.1);
-        border-left: 4px solid #FFD700;
-        color: #fff;
-        padding: 12px 15px;
-        border-radius: 4px;
-        margin-bottom: 25px;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        animation: fadeIn 0.5s;
-    }
-    .custom-alert.error { border-color: #ff4d4d; background: rgba(255, 77, 77, 0.1); }
-    .custom-alert i { font-size: 1.1rem; }
 
     /* --- INPUTS --- */
-    .input-group-text {
-        background-color: rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-right: none;
-        color: #FFD700;
-    }
-
-    .form-control-premium {
-        background-color: rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-left: none;
-        color: white;
-        padding: 12px;
-        transition: all 0.3s;
-    }
-
-    .form-control-premium:focus {
-        background-color: rgba(0, 0, 0, 0.5);
-        box-shadow: none;
-        border-color: #FFD700;
-        color: white;
+    .form-group { margin-bottom: 15px; text-align: left; }
+    
+    .input-field {
+        width: 100%;
+        background: #0f0f0f;
+        border: 1px solid #333;
+        padding: 15px 18px;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.3s;
     }
     
-    /* Arreglar borde al enfocar el input para que se ilumine el icono también */
-    .input-group:focus-within .input-group-text {
+    .input-field:focus {
         border-color: #FFD700;
-    }
-
-    .form-label {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 0.85rem;
-        font-weight: 600;
-        margin-bottom: 8px;
+        background: #141414;
     }
 
     /* --- BOTÓN --- */
     .btn-login {
         width: 100%;
-        background: linear-gradient(135deg, #FFD700 0%, #FFC700 100%);
-        border: none;
-        padding: 14px;
-        font-weight: 800;
+        background: #FFD700;
         color: #000;
-        border-radius: 8px;
+        font-weight: 800;
+        padding: 16px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 10px;
+        margin-bottom: 25px;
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-top: 10px;
-        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 5px 20px rgba(255, 215, 0, 0.15);
+        transition: transform 0.2s;
     }
+    
+    .btn-login:active { transform: scale(0.98); }
 
-    .btn-login:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
-        background: #ffe033;
-        color: #000;
+    /* --- LINKS --- */
+    .auth-links {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: #666;
+        padding: 0 5px;
     }
+    .auth-links a { color: #ccc; text-decoration: none; transition: color 0.2s; }
+    .auth-links a:hover { color: #FFD700; }
 
-    /* --- FOOTER LINKS --- */
-    .login-footer {
+    /* --- ALERTAS FLOTANTES (SOLO UNA) --- */
+    .alert {
+        position: fixed;
+        top: 85px; /* Justo debajo de la navbar */
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 99999;
+        min-width: 300px;
+        max-width: 90%;
+        background: rgba(20, 20, 20, 0.98);
+        color: #fff;
+        border: 1px solid #FFD700;
+        padding: 12px 20px;
+        border-radius: 50px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         text-align: center;
-        margin-top: 25px;
         font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.5);
+        font-weight: 500;
+        animation: slideDown 0.4s ease-out;
+        display: flex; align-items: center; justify-content: center;
     }
-    .login-footer a {
-        color: #FFD700;
-        text-decoration: none;
-        font-weight: 600;
-        transition: color 0.2s;
-    }
-    .login-footer a:hover { color: #fff; }
+    
+    .alert .btn-close, .alert .close { display: none; }
 
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes pulse { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); } }
+    @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    @keyframes slideDown { from { transform: translate(-50%, -20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="login-wrapper">
-    <div class="ambient-light"></div>
 
-    <div class="login-card">
-        <div class="login-brand">TOBUCKS</div>
-        <p class="login-subtitle">Tu entrada al universo del cine</p>
+<div class="auth-container">
+    
+    <div class="auth-card">
+        <h1 class="brand-title">TOBUCKS.</h1>
+        <p class="brand-subtitle">Bienvenido de nuevo</p>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="custom-alert {% if category == 'danger' or category == 'error' %}error{% endif %}">
-                        {% if category == 'danger' or category == 'error' %}
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                        {% else %}
-                            <i class="bi bi-info-circle-fill"></i>
-                        {% endif %}
-                        <span>{{ message }}</span>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <form method="POST" action="">
-            <div class="mb-4">
-                <label class="form-label">Usuario</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-                    <input type="text" name="username" class="form-control form-control-premium" placeholder="Ingresa tu usuario" required autofocus>
-                </div>
+        <form method="POST">
+            <div class="form-group">
+                <input type="text" name="username" class="input-field" placeholder="Usuario" required autocomplete="off">
+            </div>
+            
+            <div class="form-group">
+                <input type="password" name="password" class="input-field" placeholder="Contraseña" required>
             </div>
 
-            <div class="mb-4">
-                <label class="form-label">Contraseña</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                    <input type="password" name="password" class="form-control form-control-premium" placeholder="••••••••" required>
-                </div>
-            </div>
+            <button type="submit" class="btn-login">Ingresar</button>
 
-            <button type="submit" class="btn btn-login">
-                Iniciar Sesión
-            </button>
+            <div class="auth-links">
+                <a href="#">¿Olvidaste contraseña?</a>
+                <a href="{{ url_for('users.register') }}">Crear cuenta</a>
+            </div>
         </form>
-
-        <div class="login-footer">
-            ¿No tienes una cuenta? <a href="{{ url_for('users.register') }}">Regístrate aquí</a>
-        </div>
     </div>
+
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const alerts = document.querySelectorAll('.alert');
+        
+        // Si hay más de una, borrar las viejas y dejar solo la última
+        if (alerts.length > 1) {
+            for (let i = 0; i < alerts.length - 1; i++) {
+                alerts[i].remove();
+            }
+        }
+
+        // Auto-cerrar a los 3.5 segundos
+        setTimeout(() => {
+            const remainingAlert = document.querySelector('.alert');
+            if (remainingAlert) {
+                remainingAlert.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+                remainingAlert.style.opacity = "0";
+                remainingAlert.style.transform = "translate(-50%, -20px)";
+                setTimeout(() => remainingAlert.remove(), 500);
+            }
+        }, 3500);
+    });
+</script>
+
 {% endblock %}
