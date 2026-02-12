@@ -12,28 +12,29 @@ Tobucks is an advanced web application built with Flask that transforms how user
 
 ## 🚀 Key Features
 
-- **AI Concierge Experience**: Powered by Groq (Llama 3), users can describe what they want to watch in natural language. The system understands the "vibe" and era to provide intelligent suggestions.
-- **Self-Growing Database (Magic Import)**: If a recommended movie isn't in the local database, the system automatically fetches high-quality metadata from OMDb, including posters and ratings.
+- **AI Concierge Experience**: Powered by Groq (Llama 3), users can describe what they want to watch in natural language. The system entiende la "vibra" y la época para ofrecer sugerencias inteligentes.
+- **Self-Growing Database (Magic Import)**: Si una película recomendada no está en la base de datos local, el sistema obtiene automáticamente metadatos de alta calidad de OMDb, incluyendo pósters y calificaciones.
 - **Smart Automation**:
-    - **Auto-Translation**: English synopses are instantly translated to Spanish.
-    - **Auto-Trailer Discovery**: Searches and embeds YouTube trailers automatically for every new entry.
-    - **Genre Normalization**: Dynamically creates and translates genres to maintain a clean, Spanish-language catalog.
-- **Multi-Platform Optimization**: A fully responsive interface with dedicated **Web and Mobile** versions, ensuring a premium experience on any device.
-- **Interactive Graph Visualization**: Uses D3.js to show the complex connections between genres and the movie library.
-- **Robust Security**: Complete user authentication system with session management and administrative controls.
+    - **Auto-Translation**: Las sinopsis en inglés se traducen instantáneamente al español.
+    - **Auto-Trailer Discovery**: Busca y vincula trailers de YouTube automáticamente para cada nueva entrada.
+    - **Genre Normalization**: Crea y traduce géneros dinámicamente para mantener un catálogo limpio en español.
+- **Multi-Platform Optimization**: Interfaz totalmente responsiva con versiones optimizadas para **PC y Móvil**, garantizando una experiencia premium en cualquier dispositivo.
+- **Interactive Graph Visualization**: Utiliza D3.js para mostrar las conexiones complejas entre géneros y la biblioteca de películas.
+- **Robust Security**: Sistema completo de autenticación de usuarios con gestión de sesiones y controles administrativos.
 
 ## 📱 Interface Preview
-- **Desktop version**
-<img width="1884" height="885" alt="Tobucks Desktop Interface" src="https://github.com/user-attachments/assets/effa5d41-3f5e-48a1-919f-e3217387cd45" />
-- **Mobile version**:
-- <img width="1179" height="2128" alt="IMG_2558" src="https://github.com/user-attachments/assets/329d5ad7-58a8-428c-86d5-2e19f8705c14" />
-*The system adapts seamlessly between high-resolution desktop monitors and mobile touchscreens.*
+
+| **Desktop Version** | **Mobile Version** |
+|:---:|:---:|
+| <img src="https://github.com/user-attachments/assets/effa5d41-3f5e-48a1-919f-e3217387cd45" width="100%" alt="Tobucks Desktop" /> | <img src="https://github.com/user-attachments/assets/329d5ad7-58a8-428c-86d5-2e19f8705c14" width="220" alt="Tobucks Mobile" /> |
+
+*El sistema se adapta perfectamente entre monitores de escritorio de alta resolución y pantallas táctiles móviles.*
 
 ## 🛠️ Tech Stack
 
 - **Backend**: Python 3.x / Flask
 - **AI/LLM**: Groq Cloud API (Llama 3.3)
-- **Database**: SQLAlchemy (Support for SQLite & PostgreSQL)
+- **Database**: SQLAlchemy (Soporte para SQLite & PostgreSQL)
 - **Frontend**: Bootstrap 5, Jinja2, D3.js
 - **APIs**: OMDb API, YouTube Search Python, Google Translate API
 

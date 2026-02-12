@@ -99,17 +99,23 @@ def create_app(config_class=Config):
     with app.app_context():
         from sqlalchemy import text
         try:
-            # Intentamos agregar la columna. 
-            # Si ya existe, SQLAlchemy lanzará un error y el 'except' lo atrapará.
-            db.session.execute(text("ALTER TABLE movies ADD COLUMN year INTEGER DEFAULT 0"))
-            db.session.commit()
-            print("✅ Estructura de base de datos actualizada (Columna 'year' añadida).")
+            # 1. Intentar agregar la columna year (por si acaso no se ha hecho)
+            try:
+                db.session.execute(text("ALTER TABLE movies ADD COLUMN year INTEGER DEFAULT 0"))
+                db.session.commit()
+                print("✅ Columna 'year' añadida.")
+            except:
+                db.session.rollback()
+
+            # 2. ARREGLO CRÍTICO: Sincronizar el contador de IDs en PostgreSQL
+            # Esto busca el ID más alto y le dice al contador que empiece desde ahí + 1
+            if os.getenv('DATABASE_URL'): # Solo si estamos en la nube (Postgres)
+                db.session.execute(text("SELECT setval('movies_id_seq', (SELECT MAX(id) FROM movies))"))
+                db.session.commit()
+                print("✅ Secuencia de IDs sincronizada en Postgres.")
+
         except Exception as e:
             db.session.rollback()
-            # Si el error es porque la columna ya existe, no hacemos nada.
-            if "already exists" in str(e).lower() or "duplicate column" in str(e).lower():
-                print("ℹ️ Estructura de BD ya estaba al día.")
-            else:
-                print(f"⚠️ Nota de migración: {e}")
+            print(f"⚠️ Nota de mantenimiento: {e}")
 
     return app
