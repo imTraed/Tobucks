@@ -164,96 +164,101 @@ def ask_adventure():
     def magic_import(items):
         final_list = []
         for item in items:
+            # 1. Obtención flexible del título
             title = item.get('title') or item.get('título')
             if not title: continue
             
-            # Buscar en DB
+            # 2. Búsqueda en base de datos local
             movie = Movie.query.filter(Movie.title.ilike(title)).first()
             if not movie:
                 movie = Movie.query.filter(Movie.title.ilike(f"%{title}%")).first()
 
-            # Importar si falta
+            # 3. Importación desde OMDb si no existe localmente
             if not movie and omdb_key:
                 try:
-                    r = requests.get(f'http://www.omdbapi.com/?t={title}&apikey={omdb_key}', timeout=4).json()
+                    r = requests.get(f'http://www.omdbapi.com/?t={title}&apikey={omdb_key}', timeout=5).json()
                     
                     if r.get('Response') == 'True':
                         safe_title = r.get('Title')
-                        poster = download_poster(r.get('Poster'))
                         
+                        # Procesamiento de Año (limpieza de formatos como "2019–")
                         year_str = r.get('Year', '0')
-                        match = re.search(r'\d{4}', year_str)
+                        match = re.search(r'\d{4}', str(year_str))
                         clean_year = int(match.group()) if match else 0
 
-                        desc = translate_text(r.get('Plot'))
-                        trailer = get_trailer_url(safe_title, clean_year)
-
+                        # --- CREACIÓN DEL OBJETO MOVIE CON TODOS LOS CAMPOS ---
                         movie = Movie(
                             title=safe_title,
                             slug=manual_slugify(safe_title),
-                            description=desc,
-                            poster=poster,
-                            year=clean_year,
+                            description=translate_text(r.get('Plot')), # Sinopsis traducida
+                            poster=download_poster(r.get('Poster')),   # Descarga de portada
+                            year=clean_year,                           # Año de lanzamiento
                             rating=float(r.get('imdbRating', 0)) if r.get('imdbRating') != 'N/A' else 0.0,
-                            trailer_url=trailer,
-                            runtime=r.get('Runtime', 'N/A')
+                            trailer_url=get_trailer_url(safe_title, clean_year), # Búsqueda de trailer
+                            runtime=r.get('Runtime', 'N/A')            # Duración
                         )
                         
-                        # --- GÉNEROS INTELIGENTES (AQUÍ ESTÁ EL CAMBIO) ---
+                        # --- PASO CRÍTICO: Agregar a la sesión ANTES de los géneros ---
+                        # Esto evita el SAWarning: Object not in session
+                        db.session.add(movie)
+                        db.session.flush() # Sincroniza el objeto para permitir relaciones
+
+                        # 4. Gestión de Géneros Dinámicos
                         if r.get('Genre') and r.get('Genre') != 'N/A':
                             genre_names = r.get('Genre').split(',')
                             
                             for g_name in genre_names:
-                                # 1. Limpiar nombre (quitar espacios)
                                 raw_name = g_name.strip()
-                                
-                                # 2. Traducir usando el mapa (Comedy -> Comedia)
-                                # Si no está en el mapa, se queda igual (raw_name)
+                                # Normalización/Traducción (ej. Comedy -> Comedia)
                                 translated_name = GENRE_MAP.get(raw_name, raw_name)
                                 
-                                # 3. Buscar si YA existe en la base de datos (en español o inglés)
+                                # Buscar o crear el género en la BD
                                 g_db = Genre.query.filter(Genre.name.ilike(translated_name)).first()
                                 
                                 if not g_db:
-                                    # Si no existe tampoco en español, entonces lo creamos
                                     g_db = Genre(name=translated_name)
                                     db.session.add(g_db)
-                                    db.session.commit()
+                                    db.session.flush() # Asegura que el género tenga ID
                                 
-                                # 4. Asignar a la película
+                                # Vincular género a la película
                                 if g_db not in movie.genres:
                                     movie.genres.append(g_db)
-                        # ------------------------------------------------
 
-                        db.session.add(movie)
+                        # 5. Guardado final de la transacción
                         db.session.commit()
+                        print(f"✨ Importación exitosa: {safe_title}")
                         
                 except Exception as e:
+                    db.session.rollback() # Revierte cambios si hay error (evita UniqueViolation)
                     print(f"⚠️ Error importando '{title}': {e}")
-                    pass
+                    movie = None
 
+            # 6. Construcción de la lista de respuesta para la interfaz
             if movie:
+                # Usamos el primer género disponible para la tarjeta de previsualización
                 g_name = movie.genres[0].name if movie.genres else "Cine"
                 final_list.append({
                     'id': movie.id, 
                     'title': movie.title, 
                     'poster': movie.poster, 
                     'genres': [g_name], 
-                    'reason': item.get('reason', 'Recomendación IA'),
+                    'reason': item.get('reason') or item.get('razón') or 'Recomendación IA',
                     'year': movie.year,
                     'runtime': movie.runtime
                 })
         return final_list
 
+    # Ejecución del importador para las sugerencias de la IA
     top = magic_import(raw_data.get('top_picks', []))
     also = magic_import(raw_data.get('also_like', []))
 
+    # Manejo de listas vacías para evitar errores 404 en el frontend
     if not top and not also:
         print("⚠️ Debug: Las listas regresaron vacías desde el importador.")
         return jsonify({
-        'top_picks': [], 
-        'also_like': [], 
-        'debug_msg': 'La IA sugirió títulos, pero no se pudieron importar.'
-        }), 200 # Cambiamos a 200 para que la web no explote
+            'top_picks': [], 
+            'also_like': [], 
+            'debug_msg': 'La IA sugirió títulos, pero no se pudieron importar o encontrar.'
+        }), 200 
 
     return jsonify({'top_picks': top, 'also_like': also})
