@@ -12,29 +12,38 @@ Tobucks is an advanced web application built with Flask that transforms how user
 
 ## 🚀 Key Features
 
-- **AI Concierge Experience**: Powered by Groq (Llama 3), users can describe what they want to watch in natural language. The system entiende la "vibra" y la época para ofrecer sugerencias inteligentes.
-- **Self-Growing Database (Magic Import)**: Si una película recomendada no está en la base de datos local, el sistema obtiene automáticamente metadatos de alta calidad de OMDb, incluyendo pósters y calificaciones.
+- **AI Concierge Experience**: Powered by Groq (Llama 3.3), users can describe what they want to watch in natural language. The system entiende el "vibe" y la época para dar sugerencias inteligentes.
+- **Self-Growing Database (Magic Import)**: Si una película no está en la base de datos local, el sistema obtiene automáticamente metadatos de OMDb, incluyendo pósters y calificaciones.
 - **Smart Automation**:
     - **Auto-Translation**: Las sinopsis en inglés se traducen instantáneamente al español.
-    - **Auto-Trailer Discovery**: Busca y vincula trailers de YouTube automáticamente para cada nueva entrada.
-    - **Genre Normalization**: Crea y traduce géneros dinámicamente para mantener un catálogo limpio en español.
-- **Multi-Platform Optimization**: Interfaz totalmente responsiva con versiones optimizadas para **PC y Móvil**, garantizando una experiencia premium en cualquier dispositivo.
-- **Interactive Graph Visualization**: Utiliza D3.js para mostrar las conexiones complejas entre géneros y la biblioteca de películas.
-- **Robust Security**: Sistema completo de autenticación de usuarios con gestión de sesiones y controles administrativos.
+    - **Auto-Trailer Discovery**: Busca e integra trailers de YouTube automáticamente.
+    - **Genre Normalization**: Traduce y crea géneros dinámicamente para mantener el catálogo limpio.
+- **Multi-Platform Optimization**: Interfaz responsiva con versiones dedicadas para **Web y Mobile**.
+- **Interactive Graph Visualization**: Usa D3.js para mostrar las conexiones entre géneros y películas.
+- **Robust Security**: Sistema de autenticación completo con gestión de sesiones y roles administrativos.
 
 ## 📱 Interface Preview
 
-| **Desktop Version** | **Mobile Version** |
-|:---:|:---:|
-| <img src="https://github.com/user-attachments/assets/effa5d41-3f5e-48a1-919f-e3217387cd45" width="100%" alt="Tobucks Desktop" /> | <img src="https://github.com/user-attachments/assets/329d5ad7-58a8-428c-86d5-2e19f8705c14" width="220" alt="Tobucks Mobile" /> |
+<table width="100%">
+  <tr>
+    <td width="60%" align="center" valign="top">
+      <strong>🖥️ Desktop Version</strong><br>
+      <img src="https://github.com/user-attachments/assets/effa5d41-3f5e-48a1-919f-e3217387cd45" alt="Tobucks Desktop Interface" style="border-radius: 10px; margin-top: 10px;">
+    </td>
+    <td width="40%" align="center" valign="top">
+      <strong>📱 Mobile Version</strong><br>
+      <img src="https://github.com/user-attachments/assets/329d5ad7-58a8-428c-86d5-2e19f8705c14" alt="Tobucks Mobile Interface" style="border-radius: 10px; margin-top: 10px;">
+    </td>
+  </tr>
+</table>
 
-*El sistema se adapta perfectamente entre monitores de escritorio de alta resolución y pantallas táctiles móviles.*
+*The system adapts seamlessly between high-resolution desktop monitors and mobile touchscreens.*
 
 ## 🛠️ Tech Stack
 
 - **Backend**: Python 3.x / Flask
 - **AI/LLM**: Groq Cloud API (Llama 3.3)
-- **Database**: SQLAlchemy (Soporte para SQLite & PostgreSQL)
+- **Database**: SQLAlchemy (Support for SQLite & PostgreSQL)
 - **Frontend**: Bootstrap 5, Jinja2, D3.js
 - **APIs**: OMDb API, YouTube Search Python, Google Translate API
 
@@ -44,3 +53,42 @@ Tobucks is an advanced web application built with Flask that transforms how user
    ```bash
    git clone [https://github.com/JoshuaJacome/Tobucks.git](https://github.com/JoshuaJacome/Tobucks.git)
    cd Tobucks
+Create a Virtual Environment and Install Dependencies:
+
+Bash
+python -m venv venv
+# On Windows
+venv\Scripts\activate
+# Install Core + AI libraries
+python -m pip install -r requirements.txt
+Environment Configuration:
+Crea un archivo .env en la raíz y añade tus llaves:
+
+Fragmento de código
+SECRET_KEY=your_secret_key
+GROQ_API_KEY=your_groq_key
+OMDB_API_KEY=your_omdb_key
+DATABASE_URL=sqlite:///instance/bus_station.db
+Initialize Database:
+
+Bash
+flask db upgrade
+# Or run the manual creation script
+python scripts/create_tables.py
+Launch:
+
+Bash
+python run.py
+Visita http://localhost:5000 para iniciar la experiencia.
+
+📝 Technical Notes
+Responsive Design: La UI incluye media queries específicas para navegación móvil y botones táctiles.
+
+Dynamic Catalog: Diseñado para crecer orgánicamente basado en la interacción del usuario.
+
+Data Persistence: Arquitectura modular con Blueprints para separar la lógica de negocio de los servicios de IA.
+
+👨‍💻 Author
+Joshua Jacome Engineering in Systems Student
+
+Project Status: Private / Academic Evaluation
