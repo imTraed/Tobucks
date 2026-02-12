@@ -1,6 +1,6 @@
 # Tobucks – Next-Gen Movie Recommendation System
 
-> **⚠️ LEGAL NOTICE: PRIVATE PROPERTY**
+> **LEGAL NOTICE: PRIVATE PROPERTY**
 >
 > **Copyright (c) 2026 Joshua Jacome. All rights reserved.**
 > 
@@ -10,7 +10,7 @@
 
 Tobucks is an advanced web application built with Flask that transforms how users discover cinema. Beyond simple filtering, Tobucks uses Artificial Intelligence to understand user narratives and automatically build its own movie catalog in real-time.
 
-## 🚀 Key Features
+## Key Features
 
 - **AI Concierge Experience**: Powered by Groq (Llama 3.3), users can describe what they want to watch in natural language. The system understands the "vibe" and era to provide intelligent suggestions.
 - **Self-Growing Database (Magic Import)**: If a recommended movie isn't in the local database, the system automatically fetches high-quality metadata from OMDb, including posters and ratings.
@@ -22,16 +22,16 @@ Tobucks is an advanced web application built with Flask that transforms how user
 - **Interactive Graph Visualization**: Uses D3.js to show the complex connections between genres and the movie library.
 - **Robust Security**: Complete user authentication system with session management and administrative controls.
 
-## 📱 Interface Preview
+## Interface Preview
 
 <table width="100%">
   <tr>
     <td width="65%" align="center" valign="top">
-      <strong>🖥️ Desktop Version</strong><br>
+      <strong>Desktop Version</strong><br>
       <img src="https://github.com/user-attachments/assets/effa5d41-3f5e-48a1-919f-e3217387cd45" alt="Tobucks Desktop Interface" style="border-radius: 10px; margin-top: 10px;">
     </td>
     <td width="35%" align="center" valign="top">
-      <strong>📱 Mobile Version</strong><br>
+      <strong>Mobile Version</strong><br>
       <img src="https://github.com/user-attachments/assets/329d5ad7-58a8-428c-86d5-2e19f8705c14" alt="Tobucks Mobile Interface" style="border-radius: 10px; margin-top: 10px;">
     </td>
   </tr>
@@ -39,7 +39,7 @@ Tobucks is an advanced web application built with Flask that transforms how user
 
 *The system adapts seamlessly between high-resolution desktop monitors and mobile touchscreens.*
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend**: Python 3.x / Flask
 - **AI/LLM**: Groq Cloud API (Llama 3.3)
@@ -47,7 +47,7 @@ Tobucks is an advanced web application built with Flask that transforms how user
 - **Frontend**: Bootstrap 5, Jinja2, D3.js
 - **APIs**: OMDb API, YouTube Search Python, Google Translate API
 
-## ⚙️ Installation and Execution
+## Installation and Execution
 
 1. **Clone the repository**:
    ```bash
@@ -81,14 +81,14 @@ Bash
 python run.py
 Visit http://localhost:5000 to start the experience.
 
-📝 Technical Notes
+**Technical Notes**
 Responsive Design: The UI includes specific CSS media queries to handle mobile navigation bars and touch-friendly action buttons.
 
 Dynamic Catalog: The system is designed to start with an empty database and grow based on user interactions.
 
 Data Persistence: Uses a modular architecture with Blueprints to separate business logic from AI services.
 
-👨‍💻 Author
+**Author**
 Joshua Jacome
 Engineering in Systems Student
 
