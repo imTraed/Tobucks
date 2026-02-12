@@ -23,9 +23,10 @@ Tobucks is an advanced web application built with Flask that transforms how user
 - **Robust Security**: Complete user authentication system with session management and administrative controls.
 
 ## 📱 Interface Preview
-
+- **Desktop version**
 <img width="1884" height="885" alt="Tobucks Desktop Interface" src="https://github.com/user-attachments/assets/effa5d41-3f5e-48a1-919f-e3217387cd45" />
-
+- **Mobile version**:
+- <img width="1179" height="2128" alt="IMG_2558" src="https://github.com/user-attachments/assets/329d5ad7-58a8-428c-86d5-2e19f8705c14" />
 *The system adapts seamlessly between high-resolution desktop monitors and mobile touchscreens.*
 
 ## 🛠️ Tech Stack
