@@ -1,35 +1,54 @@
-# Entornos virtuales
+# ========================================================================
+# TOBUCKS: GITIGNORE MAESTRO
+# ========================================================================
+
+# --- Entornos Virtuales ---
 venv/
 env/
 ENV/
-.venv
+.venv/
+bin/
+include/
+lib/
+share/
+pyvenv.cfg
 
-# Archivos de configuración con secretos
+# --- Archivos de Configuración y Secretos (CRÍTICO) ---
 .env
 .env.local
 .env.*.local
+secrets.txt
+credentials.txt
+*.pem
+*.key
 
-# Base de datos SQLite (local)
+# --- Base de Datos SQLite (Local) ---
 instance/
 *.db
 *.sqlite
 *.sqlite3
 
-# Caché de Python
+# --- Caché de Python ---
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+.ipynb_checkpoints/
 
-# Distribución/empaquetado
+# --- Multimedia y Cargas (Específico de Tobucks) ---
+# Ignoramos los pósters descargados automáticamente para no saturar el repo
+app/static/uploads/*
+# Excepto el archivo .gitkeep si quieres mantener la carpeta creada
+!app/static/uploads/.gitkeep
+
+# --- Distribución y Empaquetado ---
 build/
 develop-eggs/
 dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -40,35 +59,35 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# Herramientas
-.DS_Store
-.idea/
+# --- IDEs y Herramientas de Desarrollo ---
 .vscode/
+.idea/
 *.swp
 *.swo
 *~
 .pytest_cache/
 .coverage
 htmlcov/
+.history/
+.cache/
 
-# Exportaciones
+# --- Archivos del Sistema ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- Exportaciones y Backups ---
 *.sql
 *.sql.gz
 *.json
 tobucks_*.sql
 tobucks_*.json
+backup_*.db
 
-# Logs
+# --- Logs ---
 *.log
 logs/
-
-# IDE
-.vscode/settings.json
-.vscode/launch.json
-.vscode/extensions.json
-
-# Secretos (IMPORTANTE!)
-secrets.txt
-credentials.txt
-/instance/*.db
+instance/logs/

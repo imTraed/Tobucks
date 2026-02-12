@@ -175,7 +175,7 @@
 {% block content %}
 
 <div class="fixed-backdrop-image"
-     style="background-image: url('{% if movie.poster %}{{ url_for('static', filename=movie.poster) }}{% else %}{{ url_for('static', filename='img/default-movie.png') }}{% endif %}');">
+    style="background-image: url('{% if movie.poster %}{{ url_for('static', filename=movie.poster) }}{% else %}{{ url_for('static', filename='img/default-movie.png') }}{% endif %}');">
 </div>
 <div class="fixed-backdrop-overlay"></div>
 
@@ -184,8 +184,8 @@
     <div class="col-xl-10">
       
       <a href="{{ url_for('movies.list_movies') }}" 
-         onclick="history.back(); return false;" 
-         class="text-white text-decoration-none mb-4 d-inline-flex align-items-center hover-text-gold transition-base">
+        onclick="history.back(); return false;" 
+        class="text-white text-decoration-none mb-4 d-inline-flex align-items-center hover-text-gold transition-base">
         <i class="bi bi-arrow-left fs-4 me-2"></i>
         <span class="fs-6 fw-bold text-uppercase" style="letter-spacing: 1px;">Volver</span>
       </a>
@@ -223,6 +223,13 @@
                 {% endfor %}
                 <span class="ms-2 fw-bold text-white small">{{ rating }}/10</span>
             </div>
+
+            {% if movie.year and movie.year > 0 %}
+            <div class="d-flex align-items-center text-white-50 ps-3 border-start border-secondary" style="height: 20px;">
+                <i class="bi bi-calendar3 me-2 text-warning"></i>
+                <span class="fw-bold small">{{ movie.year }}</span>
+            </div>
+            {% endif %}
 
             {% if movie.runtime and movie.runtime != 'N/A' %}
             <div class="d-flex align-items-center text-white-50 ps-3 border-start border-secondary" style="height: 20px;">
@@ -262,26 +269,26 @@
           </div>
 
           <div class="mb-5 pe-lg-5">
-             <h5 class="fw-bold text-gold text-uppercase mb-3 small ls-1">
+            <h5 class="fw-bold text-gold text-uppercase mb-3 small ls-1">
                 <i class="bi bi-play-circle-fill me-2"></i>Trailer
-             </h5>
+            </h5>
 
-             {% if movie.embed_url %}
-                 <div class="trailer-wrapper">
-                     <div class="ratio ratio-16x9">
-                         <iframe src="{{ movie.embed_url }}" title="Trailer" frameborder="0" allowfullscreen></iframe>
-                     </div>
-                 </div>
-             {% else %}
-                 <div class="alert alert-dark border-secondary d-flex flex-column flex-md-row align-items-center text-white-50 p-3 rounded-4">
-                     <div class="mb-3 mb-md-0 text-center text-md-start">
+            {% if movie.embed_url %}
+                <div class="trailer-wrapper">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="{{ movie.embed_url }}" title="Trailer" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-dark border-secondary d-flex flex-column flex-md-row align-items-center text-white-50 p-3 rounded-4">
+                    <div class="mb-3 mb-md-0 text-center text-md-start">
                         <span class="d-block fw-bold text-white"><i class="bi bi-youtube me-2 text-danger"></i>Trailer no disponible</span>
-                     </div>
-                     <a href="https://www.youtube.com/results?search_query=trailer+{{ movie.title }}" target="_blank" class="btn btn-outline-light btn-sm ms-md-auto rounded-pill">
+                    </div>
+                    <a href="https://www.youtube.com/results?search_query=trailer+{{ movie.title }}" target="_blank" class="btn btn-outline-light btn-sm ms-md-auto rounded-pill">
                         Buscar en YouTube
-                     </a>
-                 </div>
-             {% endif %}
+                    </a>
+                </div>
+            {% endif %}
           </div>
 
           {% if current_user.is_admin %}

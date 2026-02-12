@@ -320,23 +320,37 @@ body {
             { text: "¿Cómo está tu <span>ánimo</span>?", options: [ { title: "Curioso", desc: "Quiero aprender", icon: "bi-lightbulb", val: "ánimo: intelectual" }, { title: "Cansado", desc: "Algo suave", icon: "bi-cup-hot", val: "ánimo: confort" }, { title: "Melancólico", desc: "Para llorar", icon: "bi-cloud-rain", val: "ánimo: drama" }, { title: "Energético", desc: "Sorpréndeme", icon: "bi-lightning", val: "ánimo: acción" } ]},
             { text: "¿Nivel de <span>complejidad</span>?", options: [ { title: "Simple", desc: "Solo disfrutar", icon: "bi-tv", val: "complejidad: baja" }, { title: "Interesante", desc: "Buena historia", icon: "bi-journal-text", val: "complejidad: media" }, { title: "Reto Mental", desc: "Para pensar mucho", icon: "bi-puzzle", val: "complejidad: alta" }, { title: "Hechos Reales", desc: "Documental", icon: "bi-camera-reels", val: "complejidad: real" } ]},
             { text: "¿Qué te apetece <span>ver</span>?", options: [ { title: "Mundo Real", desc: "Drama o Crimen", icon: "bi-building", val: "género: realismo" }, { title: "Fantasía", desc: "Magia y Dragones", icon: "bi-magic", val: "género: fantasía" }, { title: "Miedo", desc: "Sustos fuertes", icon: "bi-emoji-astonished", val: "género: terror" }, { title: "Ciencia Ficción", desc: "Espacio y Futuro", icon: "bi-rocket", val: "género: sci-fi" } ]},
-            { text: "¿Época preferida?", options: [ { title: "Lo Nuevo", desc: "Últimos años", icon: "bi-phone", val: "época: moderna" }, { title: "Clásicos", desc: "Cine de oro", icon: "bi-award", val: "época: clásica" }, { title: "Retro", desc: "Años 80 y 90", icon: "bi-boombox", val: "época: retro" }, { title: "Da igual", desc: "Si es buena vale", icon: "bi-calendar", val: "época: cualquiera" } ]},
+            
+            // AQUÍ CAPTURAMOS LA ÉPOCA PARA EL FILTRO OPTIMIZADO
+            { text: "¿Época preferida?", options: [ 
+                { title: "Lo Nuevo", desc: "Últimos años", icon: "bi-phone", val: "época: moderna", meta: "recent" }, 
+                { title: "Clásicos", desc: "Cine de oro", icon: "bi-award", val: "época: clásica", meta: "old" }, 
+                { title: "Retro", desc: "Años 80 y 90", icon: "bi-boombox", val: "época: retro", meta: "90s" }, 
+                { title: "Da igual", desc: "Si es buena vale", icon: "bi-calendar", val: "época: cualquiera", meta: "all" } 
+            ]},
+            
             { text: "¿Tipo de final?", options: [ { title: "Feliz", desc: "Sonriendo", icon: "bi-emoji-smile", val: "final: feliz" }, { title: "Triste", desc: "Impactante", icon: "bi-emoji-frown", val: "final: triste" }, { title: "Abierto", desc: "Para pensar", icon: "bi-question-circle", val: "final: abierto" }, { title: "Sorpresa", desc: "Giro inesperado", icon: "bi-exclamation-triangle", val: "final: sorpresa" } ]}
         ],
+        // ... (Mantén los otros flujos igual, si quieres agregar filtro de época en ellos, usa la propiedad 'meta' como arriba) ...
         'pareja': [
-            { text: "¿Cuánto <span>tiempo</span> tienen?", options: [ { title: "Rápido", desc: "Menos de 90 min", icon: "bi-stopwatch", val: "duración: corta" }, { title: "Estándar", desc: "Unas 2 horas", icon: "bi-clock", val: "duración: normal" }, { title: "Maratón", desc: "Sin prisa", icon: "bi-infinity", val: "duración: larga" }, { title: "Miniserie", desc: "Varios capítulos", icon: "bi-layers", val: "duración: miniserie" } ]},
-            { text: "¿Qué ambiente buscan?", options: [ { title: "Romántico", desc: "Amor y parejas", icon: "bi-heart-fill", val: "vibe: romántico" }, { title: "Relajado", desc: "Para tener de fondo", icon: "bi-volume-down", val: "vibe: ligero" }, { title: "Intriga", desc: "Resolver misterio", icon: "bi-eye", val: "vibe: thriller" }, { title: "Risas", desc: "Divertirse", icon: "bi-emoji-laughing", val: "vibe: comedia" } ]},
-            { text: "¿Quién <span>elige</span> hoy?", options: [ { title: "Los dos", desc: "Decisión mutua", icon: "bi-people", val: "elección: equilibrada" }, { title: "Sorpresa", desc: "Algo único", icon: "bi-gift", val: "elección: joya oculta" }, { title: "Ligero", desc: "Fácil de ver", icon: "bi-feather", val: "elección: fácil" }, { title: "Turno", desc: "Elige el otro", icon: "bi-arrow-left-right", val: "elección: variada" } ]},
-            { text: "¿Qué tan <span>intensa</span>?", options: [ { title: "Drama", desc: "Historia seria", icon: "bi-droplet", val: "intensidad: drama" }, { title: "Acción", desc: "Explosiones", icon: "bi-fire", val: "intensidad: acción" }, { title: "Terror", desc: "Miedo real", icon: "bi-emoji-astonished", val: "intensidad: terror" }, { title: "Misterio", desc: "Crimen/Policial", icon: "bi-search", val: "intensidad: crimen" } ]},
-            { text: "¿Dónde ocurre?", options: [ { title: "Actualidad", desc: "Hoy en día", icon: "bi-geo-alt", val: "setting: actual" }, { title: "Fantasía", desc: "Mundos mágicos", icon: "bi-stars", val: "setting: fantasía" }, { title: "Futuro", desc: "Tecnología", icon: "bi-cpu", val: "setting: futuro" }, { title: "Época", desc: "Historia antigua", icon: "bi-hourglass", val: "setting: época" } ]},
-            { text: "¿Final deseado?", options: [ { title: "Alegre", desc: "Sentirse bien", icon: "bi-sun", val: "final: feliz" }, { title: "Debate", desc: "Para conversar", icon: "bi-chat-dots", val: "final: conversación" }, { title: "Emotivo", desc: "Llorar un poco", icon: "bi-heartbreak", val: "final: llorar" }, { title: "Impactante", desc: "Quedar en shock", icon: "bi-lightning-fill", val: "final: shock" } ]}
+             { text: "¿Cuánto <span>tiempo</span> tienen?", options: [ { title: "Rápido", desc: "Menos de 90 min", icon: "bi-stopwatch", val: "duración: corta" }, { title: "Estándar", desc: "Unas 2 horas", icon: "bi-clock", val: "duración: normal" }, { title: "Maratón", desc: "Sin prisa", icon: "bi-infinity", val: "duración: larga" }, { title: "Miniserie", desc: "Varios capítulos", icon: "bi-layers", val: "duración: miniserie" } ]},
+             { text: "¿Qué ambiente buscan?", options: [ { title: "Romántico", desc: "Amor y parejas", icon: "bi-heart-fill", val: "vibe: romántico" }, { title: "Relajado", desc: "Para tener de fondo", icon: "bi-volume-down", val: "vibe: ligero" }, { title: "Intriga", desc: "Resolver misterio", icon: "bi-eye", val: "vibe: thriller" }, { title: "Risas", desc: "Divertirse", icon: "bi-emoji-laughing", val: "vibe: comedia" } ]},
+             { text: "¿Quién <span>elige</span> hoy?", options: [ { title: "Los dos", desc: "Decisión mutua", icon: "bi-people", val: "elección: equilibrada" }, { title: "Sorpresa", desc: "Algo único", icon: "bi-gift", val: "elección: joya oculta" }, { title: "Ligero", desc: "Fácil de ver", icon: "bi-feather", val: "elección: fácil" }, { title: "Turno", desc: "Elige el otro", icon: "bi-arrow-left-right", val: "elección: variada" } ]},
+             { text: "¿Qué tan <span>intensa</span>?", options: [ { title: "Drama", desc: "Historia seria", icon: "bi-droplet", val: "intensidad: drama" }, { title: "Acción", desc: "Explosiones", icon: "bi-fire", val: "intensidad: acción" }, { title: "Terror", desc: "Miedo real", icon: "bi-emoji-astonished", val: "intensidad: terror" }, { title: "Misterio", desc: "Crimen/Policial", icon: "bi-search", val: "intensidad: crimen" } ]},
+             { text: "¿Dónde ocurre?", options: [ { title: "Actualidad", desc: "Hoy en día", icon: "bi-geo-alt", val: "setting: actual" }, { title: "Fantasía", desc: "Mundos mágicos", icon: "bi-stars", val: "setting: fantasía" }, { title: "Futuro", desc: "Tecnología", icon: "bi-cpu", val: "setting: futuro" }, { title: "Época", desc: "Historia antigua", icon: "bi-hourglass", val: "setting: época" } ]},
+             { text: "¿Final deseado?", options: [ { title: "Alegre", desc: "Sentirse bien", icon: "bi-sun", val: "final: feliz" }, { title: "Debate", desc: "Para conversar", icon: "bi-chat-dots", val: "final: conversación" }, { title: "Emotivo", desc: "Llorar un poco", icon: "bi-heartbreak", val: "final: llorar" }, { title: "Impactante", desc: "Quedar en shock", icon: "bi-lightning-fill", val: "final: shock" } ]}
         ],
         'amigos': [
             { text: "¿Cuánto <span>tiempo</span> hay?", options: [ { title: "Corto", desc: "Menos de 90 min", icon: "bi-stopwatch", val: "duración: corta" }, { title: "Normal", desc: "Unas 2 horas", icon: "bi-clock", val: "duración: normal" }, { title: "Saga", desc: "Varias pelis", icon: "bi-film", val: "duración: épica" }, { title: "Toda la noche", desc: "Maratón", icon: "bi-moon-stars", val: "duración: maratón" } ]},
             { text: "¿Qué busca el <span>grupo</span>?", options: [ { title: "Pasar Miedo", desc: "Terror", icon: "bi-emoji-dizzy", val: "vibe: terror" }, { title: "Acción Pura", desc: "Adrenalina", icon: "bi-speedometer2", val: "vibe: acción" }, { title: "Risas", desc: "Comedia loca", icon: "bi-emoji-laughing-fill", val: "vibe: comedia" }, { title: "Locura", desc: "Misterio raro", icon: "bi-hurricane", val: "vibe: thriller psicológico" } ]},
             { text: "¿Nivel de <span>atención</span>?", options: [ { title: "Total", desc: "Todos atentos", icon: "bi-eye-fill", val: "atención: alta" }, { title: "Baja", desc: "Ruido/Fiesta", icon: "bi-music-note-beamed", val: "atención: baja" }, { title: "Media", desc: "Para comentar", icon: "bi-chat-quote", val: "atención: media" }, { title: "Juego", desc: "Interactiva", icon: "bi-controller", val: "atención: interactiva" } ]},
             { text: "¿Estilo?", options: [ { title: "Éxito Mundial", desc: "Muy famosa", icon: "bi-ticket-perforated", val: "estilo: presupuesto alto" }, { title: "Alternativa", desc: "Cine Indie", icon: "bi-camera-video", val: "estilo: culto" }, { title: "Rara", desc: "Bizarra/Única", icon: "bi-bug", val: "estilo: raro" }, { title: "Clásico", desc: "Imperdible", icon: "bi-trophy", val: "estilo: clásico" } ]},
-            { text: "¿Época?", options: [ { title: "Actual", desc: "Hoy", icon: "bi-calendar-check", val: "época: hoy" }, { title: "Nostalgia", desc: "Años 2000", icon: "bi-disc", val: "época: 2000s" }, { title: "Retro", desc: "Años 80", icon: "bi-cassette", val: "época: 80s" }, { title: "Acción 90s", desc: "Clásicos acción", icon: "bi-boombox", val: "época: 90s" } ]},
+            { text: "¿Época?", options: [ 
+                { title: "Actual", desc: "Hoy", icon: "bi-calendar-check", val: "época: hoy", meta: "recent" }, 
+                { title: "Nostalgia", desc: "Años 2000", icon: "bi-disc", val: "época: 2000s", meta: "2000s" }, 
+                { title: "Retro", desc: "Años 80", icon: "bi-cassette", val: "época: 80s", meta: "80s" }, 
+                { title: "Acción 90s", desc: "Clásicos acción", icon: "bi-boombox", val: "época: 90s", meta: "90s" } 
+            ]},
             { text: "¿Final?", options: [ { title: "Giro Sorpresa", desc: "Nadie lo espera", icon: "bi-shuffle", val: "final: giro" }, { title: "Épico", desc: "Increíble", icon: "bi-star-fill", val: "final: espectacular" }, { title: "Risas", desc: "Divertido", icon: "bi-emoji-smile-upside-down", val: "final: divertido" }, { title: "Debate", desc: "Final abierto", icon: "bi-question-lg", val: "final: abierto" } ]}
         ],
         'familia': [
@@ -345,43 +359,40 @@ body {
             { text: "¿Tipo de peli?", options: [ { title: "Dibujos", desc: "Animada", icon: "bi-palette", val: "tipo: animación" }, { title: "Personas", desc: "Actores reales", icon: "bi-person-video", val: "tipo: live action" }, { title: "Aventura", desc: "Viajes", icon: "bi-map", val: "tipo: aventura" }, { title: "Musical", desc: "Canciones", icon: "bi-music-note-beamed", val: "tipo: musical" } ]},
             { text: "¿Tono?", options: [ { title: "Risas", desc: "Divertida", icon: "bi-emoji-laughing", val: "tono: comedia" }, { title: "Mensaje", desc: "Inspiradora", icon: "bi-heart", val: "tono: inspirador" }, { title: "Aprender", desc: "Educativa", icon: "bi-book", val: "tono: documental" }, { title: "Mágico", desc: "Fantasía", icon: "bi-stars", val: "tono: mágico" } ]},
             { text: "¿Nivel de susto?", options: [ { title: "Cero", desc: "Nada de miedo", icon: "bi-shield-check", val: "miedo: nulo" }, { title: "Poquito", desc: "Susto ligero", icon: "bi-emoji-astonished", val: "miedo: bajo" }, { title: "Suspenso", desc: "Intriga", icon: "bi-eye", val: "miedo: medio" }, { title: "Acción", desc: "Peleas", icon: "bi-lightning", val: "miedo: aventura" } ]},
-            { text: "¿Preferencia?", options: [ { title: "Disney", desc: "Pixar/Disney", icon: "bi-stars", val: "estilo: disney" }, { title: "Clásico", desc: "Familia 90s", icon: "bi-film", val: "estilo: 90s family" }, { title: "Nuevo", desc: "Moderno", icon: "bi-newspaper", val: "estilo: moderno" }, { title: "Japón", desc: "Anime/Ghibli", icon: "bi-flower3", val: "estilo: anime" } ]}
+            { text: "¿Preferencia?", options: [ { title: "Disney", desc: "Pixar/Disney", icon: "bi-stars", val: "estilo: disney" }, { title: "Clásico", desc: "Familia 90s", icon: "bi-film", val: "estilo: 90s family", meta: "90s" }, { title: "Nuevo", desc: "Moderno", icon: "bi-newspaper", val: "estilo: moderno", meta: "recent" }, { title: "Japón", desc: "Anime/Ghibli", icon: "bi-flower3", val: "estilo: anime" } ]}
         ]
     };
 
     let currentFlow = [];
     let step = -1; 
     let story = [];
+    let selectedEra = 'all'; // VARIABLE NUEVA PARA OPTIMIZACIÓN
 
-document.addEventListener("DOMContentLoaded", () => {
-    const savedResults = sessionStorage.getItem('tobucks_ai_results');
-    if (savedResults) {
-        document.getElementById('gameBox').style.display = 'none';
-        document.getElementById('progressBox').style.display = 'none';
-        renderResults(JSON.parse(savedResults));
-    } else {
-        renderInitial(); // <--- CORRECCIÓN: Usa la función correcta
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedResults = sessionStorage.getItem('tobucks_ai_results');
+        if (savedResults) {
+            document.getElementById('gameBox').style.display = 'none';
+            document.getElementById('progressBox').style.display = 'none';
+            renderResults(JSON.parse(savedResults));
+        } else {
+            renderInitial();
+        }
+    });
+
+    function renderInitial() {
+        step = -1;
+        story = []; 
+        selectedEra = 'all'; // Resetear época
+        
+        document.getElementById('resultsBox').style.display = 'none'; 
+        document.getElementById('loaderBox').style.display = 'none'; 
+        document.getElementById('gameBox').style.display = 'block'; 
+        document.getElementById('progressBox').style.display = 'block'; 
+        document.getElementById('gameBox').style.opacity = 1;
+
+        renderQuestion(initialQuestion);
+        updateProgress(0);
     }
-});
-
-function renderInitial() {
-    step = -1;
-    story = []; 
-    
-    // 1. APAGAMOS los resultados y el cargador
-    document.getElementById('resultsBox').style.display = 'none'; 
-    document.getElementById('loaderBox').style.display = 'none'; 
-    
-    // 2. ENCENDEMOS el juego y la barra de progreso
-    document.getElementById('gameBox').style.display = 'block'; 
-    document.getElementById('progressBox').style.display = 'block'; 
-
-    // 3. Forzamos la opacidad (por si el fade-out la dejó en 0)
-    document.getElementById('gameBox').style.opacity = 1;
-
-    renderQuestion(initialQuestion);
-    updateProgress(0);
-}
 
     function startFlow(flowKey) {
         currentFlow = flows[flowKey];
@@ -391,8 +402,13 @@ function renderInitial() {
         updateProgress(1);
     }
 
-    function nextStep(val, isInitial = false) {
+    // MODIFICADO: ACEPTA EL PARÁMETRO "META" (época)
+    function nextStep(val, isInitial = false, meta = null) {
         story.push(val);
+        
+        // Si la opción tenía una 'meta' (época), la guardamos
+        if (meta) { selectedEra = meta; }
+
         if (isInitial) {
             startFlow(val);
         } else {
@@ -410,7 +426,10 @@ function renderInitial() {
         const box = document.getElementById('gameBox');
         let html = `<div class="question-text">${data.text}</div><div class="options-grid">`;
         data.options.forEach(opt => {
-            const onClickFn = step === -1 ? `nextStep('${opt.val}', true)` : `nextStep('${opt.val}')`;
+            // MODIFICADO: Pasamos 'opt.meta' a nextStep
+            const metaValue = opt.meta ? `'${opt.meta}'` : 'null';
+            const onClickFn = step === -1 ? `nextStep('${opt.val}', true)` : `nextStep('${opt.val}', false, ${metaValue})`;
+            
             html += `
                 <div class="option-btn" onclick="${onClickFn}">
                     <i class="bi ${opt.icon} option-icon"></i>
@@ -427,22 +446,13 @@ function renderInitial() {
     }
 
     function updateProgress(s) {
-    // Si pasamos un número manual (como 0), úsalo. Si no, usa la variable global 'step'.
-    const actualStep = (typeof currentStepOverride === 'number') ? currentStepOverride : step;
-    
-    // Total de pasos en el flujo actual (o 5 por defecto si aún no empieza)
-    const total = (currentFlow && currentFlow.length > 0) ? currentFlow.length : 5; 
-    
-    // Cálculo simple: (Paso actual + 1) / Total * 100
-    // Sumamos 1 porque 'step' empieza en 0 (array index), pero visualmente es la pregunta 1.
-    let pct = ((actualStep + 1) / total) * 100;
-    
-    // Límites de seguridad (0% a 100%)
-    if (actualStep === -1) pct = 5; // Inicio (poquito de barra)
-    if (pct > 100) pct = 100;
-
-    document.getElementById('progressBar').style.width = `${pct}%`;
-}
+        const actualStep = (typeof currentStepOverride === 'number') ? currentStepOverride : step;
+        const total = (currentFlow && currentFlow.length > 0) ? currentFlow.length : 5; 
+        let pct = ((actualStep + 1) / total) * 100;
+        if (actualStep === -1) pct = 5; 
+        if (pct > 100) pct = 100;
+        document.getElementById('progressBar').style.width = `${pct}%`;
+    }
 
     async function finishGame() {
         document.getElementById('gameBox').style.display = 'none';
@@ -453,7 +463,11 @@ function renderInitial() {
             const res = await fetch("{{ url_for('ai.ask_adventure') }}", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ narrative: story.join(". ") })
+                // MODIFICADO: Enviamos narrative Y era
+                body: JSON.stringify({ 
+                    narrative: story.join(". "),
+                    era: selectedEra 
+                })
             });
             const data = await res.json();
             
@@ -468,13 +482,10 @@ function renderInitial() {
         } catch { alert("Error de conexión"); location.reload(); }
     }
 
-function resetGame() {
-    // 1. Borramos los resultados de la IA de la sesión
-    sessionStorage.removeItem('tobucks_ai_results');
-    
-    // 2. En lugar de recargar toda la web, reiniciamos la vista
-    renderInitial(); 
-}
+    function resetGame() {
+        sessionStorage.removeItem('tobucks_ai_results');
+        renderInitial(); 
+    }
 
     // --- RENDERIZADO VISUAL ---
     function renderResults(data) {
@@ -483,13 +494,17 @@ function resetGame() {
         const topContainer = document.getElementById('topPicksRow');
         const mentionsContainer = document.getElementById('mentionsList');
         
-        // 1. TOP PICKS
         let htmlTop = '';
         const tops = data.top_picks || [];
         
         tops.forEach((movie, index) => {
             const rank = index + 1;
-            const posterSrc = movie.poster ? `{{ url_for('static', filename='') }}${movie.poster}` : null;
+            // Manejo seguro del poster
+            let posterSrc = null;
+            if (movie.poster && movie.poster !== "N/A") {
+                posterSrc = `{{ url_for('static', filename='') }}${movie.poster}`;
+            }
+
             const imgContent = posterSrc 
                 ? `<img src="${posterSrc}" class="top-poster-img" alt="${movie.title}">`
                 : `<div class="d-flex align-items-center justify-content-center h-100 w-100 bg-dark"><i class="bi bi-film display-3 text-secondary opacity-25"></i></div>`;
@@ -506,17 +521,20 @@ function resetGame() {
             const btnClass = movie.id ? 'btn-outline-warning' : 'btn-dark disabled text-white-50';
             const btnText = movie.id ? 'Detalles <i class="bi bi-arrow-right ms-2"></i>' : 'No disponible';
 
+            // Mapeo seguro de géneros
+            const genresHtml = (movie.genres || []).map(g => `<span class="badge bg-dark border border-secondary text-white-50 me-1 mb-1" style="font-size:0.65rem;">${g}</span>`).join('');
+
             htmlTop += `
             <a href="${link}" class="ai-result-card">
                 ${posterContainer}
                 <div class="card-body-custom">
                     <h4 class="fw-bolder mb-2" style="color: #FFD700; font-size: 1.1rem; line-height: 1.3;">${movie.title}</h4>
                     <div class="mb-3">
-                        ${movie.genres.map(g => `<span class="badge bg-dark border border-secondary text-white-50 me-1 mb-1" style="font-size:0.65rem;">${g}</span>`).join('')}
+                        ${genresHtml}
                     </div>
                     <p class="card-text opacity-75 mb-3 flex-grow-1" style="font-size: 0.85rem; line-height: 1.5; color: #b0b0b0;">
                         <i class="bi bi-quote fs-5 text-warning me-1 opacity-50"></i>
-                        ${movie.reason}
+                        ${movie.reason || 'Recomendación basada en tus gustos.'}
                     </p>
                     <div class="btn ${btnClass} w-100 fw-bold rounded-pill mt-auto btn-sm py-2">
                         ${btnText}
@@ -526,19 +544,25 @@ function resetGame() {
         });
         topContainer.innerHTML = htmlTop;
 
-        // 2. MENCIONES (LISTA LATERAL)
         let htmlMentions = '';
         const extras = data.also_like || [];
         
         if (extras.length > 0) {
             extras.forEach(extra => {
-                const poster = extra.poster ? `{{ url_for('static', filename='') }}${extra.poster}` : null;
-                const posterDiv = poster 
-                    ? `<img src="${poster}" class="mention-poster-small" alt="${extra.title}">`
+                let posterExtra = null;
+                if (extra.poster && extra.poster !== "N/A") {
+                    posterExtra = `{{ url_for('static', filename='') }}${extra.poster}`;
+                }
+                
+                const posterDiv = posterExtra 
+                    ? `<img src="${posterExtra}" class="mention-poster-small" alt="${extra.title}">`
                     : `<div class="mention-placeholder-small"><i class="bi bi-film"></i></div>`;
                 
+                // Solo si tiene ID hacemos el link funcional
+                const linkExtra = extra.id ? `/movies/view/${extra.id}` : '#';
+
                 htmlMentions += `
-                <a href="/movies/view/${extra.id}" class="mention-card-small">
+                <a href="${linkExtra}" class="mention-card-small">
                     ${posterDiv}
                     <div class="text-white fw-bold text-truncate" style="font-size: 0.9rem;">${extra.title}</div>
                 </a>`;

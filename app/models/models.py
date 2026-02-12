@@ -32,17 +32,23 @@ class Genre(db.Model):
 
 class Movie(db.Model):
     """Modelo de películas con información completa"""
-    __tablename__ = "movies"
-    id = Column(Integer, primary_key=True)
-    title = Column(String(100), nullable=False)
-    slug = Column(String(150), unique=True, nullable=True)
-    description = Column(Text, nullable=True)
-    poster = Column(String(200), nullable=True)
-    trailer_url = Column(String(500), nullable=True)
-    rating = Column(Float, default=0.0)
-    runtime = Column(String(50), nullable=True)
+    __tablename__ = "movies"  # IMPORTANTE: Debe ser plural para coincidir con las ForeignKeys
+    
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    slug = db.Column(db.String(255), unique=True, nullable=True) # nullable=True evita errores gkpj
+    description = db.Column(db.Text, nullable=True)
+    poster = db.Column(db.String(255), nullable=True)
+    trailer_url = db.Column(db.String(500), nullable=True)
+    rating = db.Column(db.Float, default=0.0)
+    runtime = db.Column(db.String(50), nullable=True)
+    
+    # --- CAMPO NUEVO PARA LA IA ---
+    year = db.Column(db.Integer, default=0) 
+    # ------------------------------
 
-    genres = relationship("Genre", secondary=movie_genres, back_populates="movies", lazy="subquery")
+    # Relaciones
+    genres = db.relationship("Genre", secondary=movie_genres, back_populates="movies", lazy="subquery")
 
     def __repr__(self) -> str:
         return f"<Movie {self.title}>"
